@@ -1,12 +1,21 @@
 plugins {
 	id 'org.springframework.boot' version '2.2.0.M6'
 	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'com.palantir.docker' version '0.22.1'
 	id 'java'
 }
 
 group = 'com.tlvlp'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
+ext {
+	mockitoVersion = "3.+"
+	projectName = 'iot-portal'
+	dockerRepo = 'docker.tlvlp.com'
+	mainClass = 'com.tlvlp.iot.server.portal.Application'
+	servicePort = 8600
+}
 
 repositories {
 	mavenCentral()
@@ -24,6 +33,8 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+	testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 	testImplementation 'org.springframework.security:spring-security-test'
 }
 
@@ -35,4 +46,16 @@ dependencyManagement {
 
 test {
 	useJUnitPlatform()
+}
+
+docker {
+	name "$dockerRepo/$projectName:$project.version"
+	tag "$project.version", "$dockerRepo/$projectName:$project.version"
+	tag 'latest', "$dockerRepo/$projectName:latest"
+	dependsOn bootJar
+	files bootJar.outputs
+	dockerfile file('Dockerfile')
+	buildArgs([PROJECT: projectName, SERVICE_PORT: servicePort.toString()])
+	pull true
+	noCache true
 }
