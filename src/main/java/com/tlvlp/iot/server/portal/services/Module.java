@@ -8,6 +8,16 @@ public class Module {
     private String moduleName;
     private Double value;
 
+    @Override
+    public String toString() {
+        return "Module{" +
+                "unitID='" + unitID + '\'' +
+                ", moduleID='" + moduleID + '\'' +
+                ", moduleType='" + moduleType + '\'' +
+                ", moduleName='" + moduleName + '\'' +
+                ", value=" + value +
+                '}';
+    }
 
     public String getUnitID() {
         return unitID;
