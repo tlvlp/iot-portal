@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 public class UnitListService {
@@ -35,16 +37,39 @@ public class UnitListService {
 //                .getBody();
 //    }
 
-    public List<Unit> getUnitList() {
-        return IntStream.range(1, 21)
-                .mapToObj(i -> new Unit()
-                        .setActive(true)
-                        .setName("TestUnit_" + i)
-                        .setLastSeen(LocalDateTime.now().minusMinutes(i))
-                        .setProject("TestProject").setUnitID("TestProject-TestUnit_" + i)
-                        .setScheduledEvents(Set.of())
-                        .setModules(Set.of(new Module(), new Module())))
+    private List<Unit> parseModulesForUI(List<Unit> unitList) {
+        return unitList
+                .stream()
+                .map(unit -> {
+                    var parsedModules = unit.getModules()
+                            .stream()
+                            .map(module -> {
+                                var id = module.getModuleID();
+                                return module.setModuleType(id.split("\\|")[0]).setModuleName(id.split("\\|")[1]); })
+                            .collect(Collectors.toSet());
+                    return unit.setModules(parsedModules);
+                })
                 .collect(Collectors.toList());
+    }
+
+    public List<Unit> getUnitList() {
+        return parseModulesForUI(
+                IntStream.range(1, 21)
+                        .mapToObj(i -> new Unit()
+                                .setActive(i % 2 == 0)
+                                .setName("Unit_" + i)
+                                .setLastSeen(LocalDateTime.now().minusMinutes(i))
+                                .setProject(i%2 ==0 ? "TestProject" : "BazsalikOn")
+                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
+                                .setScheduledEvents(Set.of())
+                                .setModules(Set.of(
+                                        new Module().setModuleID("light|growlight1")
+                                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
+                                                .setValue((double) i),
+                                        new Module().setModuleID("light|growlight2")
+                                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
+                                                .setValue((double) i-1))))
+                        .collect(Collectors.toList()));
     }
 
 }

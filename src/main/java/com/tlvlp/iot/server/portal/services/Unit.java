@@ -14,6 +14,19 @@ public class Unit {
     private Set<Module> modules;
     private Set<String> scheduledEvents;
 
+    @Override
+    public String toString() {
+        return "Unit{" +
+                "unitID='" + unitID + '\'' +
+                ", name='" + name + '\'' +
+                ", project='" + project + '\'' +
+                ", active=" + active +
+                ", controlTopic='" + controlTopic + '\'' +
+                ", lastSeen=" + lastSeen +
+                ", modules=" + modules +
+                ", scheduledEvents=" + scheduledEvents +
+                '}';
+    }
 
     public String getUnitID() {
         return unitID;
