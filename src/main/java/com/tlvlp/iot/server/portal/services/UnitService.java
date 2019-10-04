@@ -24,9 +24,14 @@ public class UnitService {
         this.properties = properties;
     }
 
-//    public List<Unit> getUnitList() throws UnitRetrievalException {
+    public List<Unit> getUnitListWithModules() throws UnitRetrievalException {
+        var unitListRaw = getUnitList();
+        return updateUnitListWithParsedModules(unitListRaw);
+    }
+
+//    private List<Unit> getUnitList() throws UnitRetrievalException {
 //        try {
-//            var unitList = restTemplate.exchange(
+//            return restTemplate.exchange(
 //                    String.format("http://%s:%s%s",
 //                            properties.getAPI_GATEWAY_NAME(),
 //                            properties.getAPI_GATEWAY_PORT(),
@@ -36,24 +41,15 @@ public class UnitService {
 //                    new ParameterizedTypeReference<List<Unit>>() {
 //                    })
 //                    .getBody();
-//            return getUnitListWithParsesModules(unitList);
 //        } catch (Exception e) {
 //            throw new UnitRetrievalException("Unit list cannot be retrieved: " + e.getMessage());
 //        }
 //    }
 
-    private List<Unit> getUnitListWithParsesModules(List<Unit> unitList) {
+    private List<Unit> updateUnitListWithParsedModules(List<Unit> unitList) {
         return unitList
                 .stream()
-                .map(unit -> {
-                    var parsedModules = unit.getModules()
-                            .stream()
-                            .map(module -> {
-                                var id = module.getModuleID();
-                                return module.setModuleType(id.split("\\|")[0]).setModuleName(id.split("\\|")[1]); })
-                            .collect(Collectors.toList());
-                    return unit.setModules(parsedModules);
-                })
+                .map(this::updateUnitWithParsedModules)
                 .collect(Collectors.toList());
     }
 
@@ -68,8 +64,12 @@ public class UnitService {
 //                            LocalDateTime.now().minusWeeks(1),
 //                            LocalDateTime.now()),
 //                    UnitComposition.class);
-//            return unitComposition.getUnit()
-//                    .setScheduledEvents(unitComposition.getEvents())
+//            var unit = unitComposition.getUnit();
+//            var parsedModules = getParsedModules(unit.getModules());
+//            var parsedEvents = getParsedEvents(unitComposition.getEvents());
+//            return unit
+//                    .setModules(parsedModules)
+//                    .setScheduledEvents(parsedEvents)
 //                    .setLogs(unitComposition.getLogs());
 //        } catch (Exception e) {
 //            var err = "Unit cannot be retrieved" + e.getMessage();
@@ -77,6 +77,38 @@ public class UnitService {
 //            throw new UnitRetrievalException(err);
 //        }
 //    }
+
+    private Unit updateUnitWithParsedModules(Unit unit) {
+        var parsedModules = getParsedModules(unit.getModules());
+        return unit.setModules(parsedModules);
+    }
+
+    private List<Module> getParsedModules(List<Module> modules) {
+        return modules
+                .stream()
+                .map(module -> {
+                    var id = module.getModuleID();
+                    return module.setModuleType(id.split("\\|")[0]).setModuleName(id.split("\\|")[1]);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<Event> getParsedEvents(List<Event> events) {
+        return events
+                .stream()
+                .map(event -> event.setEventType(getEventType(event)))
+                .collect(Collectors.toList());
+    }
+
+    private EventType getEventType(Event event) {
+        var targetUrl = event.getTargetURL();
+        if (targetUrl.contains(properties.getAPI_GATEWAY_API_UNIT_MODULE_CONTROL())) {
+            return EventType.RELAY_CONTROL;
+        } else {
+            log.error("Unknown event! Unable to find type for event: " + event.getEventID());
+            return EventType.UNKNOWN;
+        }
+    }
 
 //    public void changeRelayStateFor(Module module) throws ModuleStateChangeException {
 //        var currentState = module.getValue();
@@ -96,63 +128,50 @@ public class UnitService {
 //        }
 //    }
 
-    //TODO: REMOVE TEST DATA
+    //TODO: REMOVE TEST METHOD
     public void changeRelayStateFor(Module module) throws ModuleStateChangeException {
         log.info("CHANGING RELAY STATE");
     }
 
-    //TODO: REMOVE TEST DATA
+    //TODO: REMOVE TEST METHOD
     public Unit getUnitWithSchedulesAndLogs(String unitID) throws UnitRetrievalException {
-        var unitList = getUnitListWithParsesModules(
-                IntStream.range(1, 101)
-                        .mapToObj(i -> new Unit()
-                                .setActive(i % 2 == 0)
-                                .setName("Unit_" + i)
-                                .setLastSeen(LocalDateTime.now().minusMinutes(i))
-                                .setProject(i%2 ==0 ? "TestProject" : "BazsalikOn")
-                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
-                                .setScheduledEventIDs(List.of())
-                                .setModules(List.of(
-                                        new Module().setModuleID("light|growlightpercent")
-                                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
-                                                .setValue((double) i),
-                                        new Module().setModuleID("relay|growlightrelay")
-                                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
-                                                .setValue(1d))))
-                        .collect(Collectors.toList()));
-
-        var unitSelected = unitList.stream().filter(unit -> unit.getUnitID().equals(unitID)).findFirst().orElseGet(Unit::new);
-
+        //mock selected unit
+        var unitList = getUnitList();
+        Unit unitSelected = unitList.stream().filter(unit -> unit.getUnitID().equals(unitID)).findFirst().orElseGet(Unit::new);
+        // update it with events and logs
         unitSelected
                 .setScheduledEvents(List.of(new Event()
                         .setCronSchedule("* * * * *")
                         .setEventID("eventID")
                         .setInfo("Test event").setLastUpdated(LocalDateTime.now())
-                        .setPayload(Map.of("pay", "load")).setTargetURL("http://test")))
+                        .setPayload(Map.of("pay", "load"))
+                        .setTargetURL("http://test/modulecontrolfake")))
                 .setLogs(List.of(new Log().setArrived(LocalDateTime.now().minusHours(10)).setLogEntry("Something interesting happened")));
-
-        System.out.println("UNITSELECTED: " + unitSelected);//TODO remove
+        var parsedModules = getParsedModules(unitSelected.getModules());
+        var parsedEvents = getParsedEvents(unitSelected.getScheduledEvents());
+        unitSelected.setModules(parsedModules).setScheduledEvents(parsedEvents);
         return unitSelected;
     }
 
-    //TODO: REMOVE TEST DATA
-    public List<Unit> getUnitList() throws UnitRetrievalException {
-        return getUnitListWithParsesModules(
-                IntStream.range(1, 101)
-                        .mapToObj(i -> new Unit()
-                                .setActive(i % 2 == 0)
-                                .setName("Unit_" + i)
-                                .setLastSeen(LocalDateTime.now().minusMinutes(i))
-                                .setProject(i%2 ==0 ? "TestProject" : "BazsalikOn")
-                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
-                                .setScheduledEventIDs(List.of())
-                                .setModules(List.of(
-                                        new Module().setModuleID("light|growlight1")
-                                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
-                                                .setValue((double) i),
-                                        new Module().setModuleID("light|growlight2")
-                                                .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
-                                                .setValue((double) i-1))))
-                        .collect(Collectors.toList()));
+    //TODO: REMOVE TEST METHOD
+    private List<Unit> getUnitList() throws UnitRetrievalException {
+        return IntStream.range(1, 101)
+                .mapToObj(i -> new Unit()
+                        .setActive(i % 2 == 0)
+                        .setName("Unit_" + i)
+                        .setLastSeen(LocalDateTime.now().minusMinutes(i))
+                        .setProject(i % 2 == 0 ? "TestProject" : "BazsalikOn")
+                        .setUnitID(i % 2 == 0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
+                        .setScheduledEventIDs(List.of())
+                        .setModules(List.of(
+                                new Module().setModuleID("light|growlightpercent")
+                                        .setUnitID(i % 2 == 0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
+                                        .setValue((double) i),
+                                new Module().setModuleID("relay|growlightrelay")
+                                        .setUnitID(i % 2 == 0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
+                                        .setValue(1d))))
+                .map(this::updateUnitWithParsedModules)
+                .peek(unit -> log.info("GENERATING RAW UNIT: " + unit.toString()))
+                .collect(Collectors.toList());
     }
 }
