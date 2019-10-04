@@ -1,7 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
-import com.tlvlp.iot.server.portal.services.*;
 import com.tlvlp.iot.server.portal.services.Module;
+import com.tlvlp.iot.server.portal.services.*;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -21,26 +21,27 @@ import java.util.List;
 @PageTitle("tlvlp IoT Portal - Unit Details")
 public class UnitDetails extends VerticalLayout {
 
-    public UnitDetails(UnitService unitService) {
-        try {
-            var unitID = (String) ComponentUtil.getData(UI.getCurrent(), "unitID");
-            Unit unitWithDetails = unitService.getUnitWithSchedulesAndLogs(unitID);
-            add(
-                    getLabel("Unit Details:"),
-                    getUnitDetailsForm(unitWithDetails),
-                    getLabel("Generate Report:"),
-                    getReportingForm(),
-                    getLabel("Modules:"),
-                    getModulesGrid(unitWithDetails.getModules(), unitService),
-                    getLabel("Scheduled Events:"),
-                    getEventsGrid(unitWithDetails.getScheduledEvents()),
-                    getLabel("UnitLogs"),
-                    getLogsGrid(unitWithDetails.getLogs()));
-        } catch (UnitRetrievalException e) {
+    public UnitDetails(UnitService unitService) throws UnitRetrievalException { // TODO REMOVE throws
+        var unitID = (String) ComponentUtil.getData(UI.getCurrent(), "unitID");
+        Unit unitWithDetails = unitService.getUnitWithSchedulesAndLogs(unitID);
+        add(
+                getLabel("Unit Details:"),
+                getUnitDetailsForm(unitWithDetails),
+                getLabel("Generate Report:"),
+                getReportingForm(),
+                getLabel("Modules:"),
+                getModulesGrid(unitWithDetails.getModules(), unitService),
+                getLabel("Scheduled Events:"),
+//                getEventsGrid(unitWithDetails.getScheduledEvents()),
+                getLabel("UnitLogs")//,
+//                getLogsGrid(unitWithDetails.getLogs())
+        );
+//        try {
+//        } catch (UnitRetrievalException e) {
             //todo
             // error popup
             // redirect back to unitList
-        }
+//        }
 
     }
 
@@ -95,7 +96,7 @@ public class UnitDetails extends VerticalLayout {
             if(module.getModuleType().equals("relay")) {
                 return new Button("Switch", event -> changeRelayState(module, unitService));
             }
-            return null;
+            return new Label("");
         }).setFlexGrow(10);
         grid.setWidthFull();
         grid.setHeightByRows(true);
