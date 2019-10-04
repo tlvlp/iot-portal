@@ -110,12 +110,12 @@ public class UnitService {
         }
     }
 
-//    public void changeRelayStateFor(Module module) throws ModuleStateChangeException {
+//    public void changeRelayStateFor(Module module) throws UnitUpdateException {
 //        var currentState = module.getValue();
 //        module.setValue(currentState == 0d ? 1d : 0d);
 //        try {
 //            restTemplate.postForEntity(
-//                    String.format("http://%s:%s%s?unitID=%s&timeFrom=%s&timeTo=%s",
+//                    String.format("http://%s:%s%s",
 //                            properties.getAPI_GATEWAY_NAME(),
 //                            properties.getAPI_GATEWAY_PORT(),
 //                            properties.getAPI_GATEWAY_API_UNIT_MODULE_CONTROL()),
@@ -124,12 +124,44 @@ public class UnitService {
 //        } catch (Exception e) {
 //            var err = "Problem with sending Module control message: " + e.getMessage();
 //            log.error(err);
-//            throw new ModuleStateChangeException(err);
+//            throw new UnitUpdateException(err);
+//        }
+//    }
+
+//    public void deleteScheduledEventFromUnit(Event event) throws UnitUpdateException {
+//        try {
+//            restTemplate.postForEntity(
+//                    String.format("http://%s:%s%s",
+//                            properties.getAPI_GATEWAY_NAME(),
+//                            properties.getAPI_GATEWAY_PORT(),
+//                            properties.getAPI_GATEWAY_API_DELETE_SCHEDULED_EVENT_FROM_UNIT()),
+//                    event,
+//                    String.class);
+//        } catch (Exception e) {
+//            var err = "Problem with deleting Event from Unit: " + e.getMessage();
+//            log.error(err);
+//            throw new UnitUpdateException(err);
+//        }
+//    }
+
+//    public void addScheduledEventToUnit(Event event) throws UnitUpdateException {
+//        try {
+//            restTemplate.postForEntity(
+//                    String.format("http://%s:%s%s",
+//                            properties.getAPI_GATEWAY_NAME(),
+//                            properties.getAPI_GATEWAY_PORT(),
+//                            properties.getAPI_GATEWAY_API_ADD_SCHEDULED_EVENT_TO_UNIT()),
+//                    event,
+//                    String.class);
+//        } catch (Exception e) {
+//            var err = "Problem with adding Event to Unit: " + e.getMessage();
+//            log.error(err);
+//            throw new UnitUpdateException(err);
 //        }
 //    }
 
     //TODO: REMOVE TEST METHOD
-    public void changeRelayStateFor(Module module) throws ModuleStateChangeException {
+    public void changeRelayStateFor(Module module) throws UnitUpdateException {
         log.info("CHANGING RELAY STATE");
     }
 
@@ -174,4 +206,15 @@ public class UnitService {
                 .peek(unit -> log.info("GENERATING RAW UNIT: " + unit.toString()))
                 .collect(Collectors.toList());
     }
+
+    //TODO: REMOVE TEST METHOD
+    public void deleteScheduledEventFromUnit(Event event) throws UnitUpdateException {
+        System.out.println("DELETE EVENT: " + event);
+    }
+
+    //TODO: REMOVE TEST METHOD
+    public void addScheduledEventToUnit(Event event) throws UnitUpdateException {
+        System.out.println("SAVE EVENT: " + event);
+    }
+
 }

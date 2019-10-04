@@ -1,5 +1,5 @@
 package com.tlvlp.iot.server.portal.services;
 
-enum EventType {
+public enum EventType {
     RELAY_CONTROL, UNKNOWN
 }

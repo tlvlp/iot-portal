@@ -23,23 +23,27 @@ import java.util.List;
 @PageTitle("tlvlp IoT Portal - Unit Details")
 public class UnitDetails extends VerticalLayout {
 
-    public UnitDetails(UnitService unitService) { // TODO REMOVE throws + add try catch
+    private UnitService unitService;
+
+    public UnitDetails(UnitService unitService) {
+        this.unitService = unitService;
         try {
             var unitID = (String) ComponentUtil.getData(UI.getCurrent(), "unitID");
             Unit unitWithDetails = unitService.getUnitWithSchedulesAndLogs(unitID);
             add(
+                    //TODO - central refresh function (on pageload + successfull update + add refresh button)
                     getLabel("Unit Details:"),
                     getUnitDetailsForm(unitWithDetails),
                     getLabel("Generate Report:"),
                     getReportingForm(),
                     getLabel("Modules:"),
-                    getModulesGrid(unitWithDetails.getModules(), unitService),
+                    getModulesGrid(unitWithDetails.getModules()),
                     getLabel("Scheduled Events:"),
                     getEventsGrid(unitWithDetails.getScheduledEvents()),
                     getLabel("Unit Logs (last 7 days)"),
                     getLogsGrid(unitWithDetails.getLogs()));
         } catch (UnitRetrievalException | RuntimeException e) {
-            showErrorNotification("Unit details cannot be retrieved: " + e.getMessage());
+            showNotification("Unit details cannot be retrieved: " + e.getMessage());
             UI.getCurrent().navigate(UnitList.class);
         }
     }
@@ -86,12 +90,12 @@ public class UnitDetails extends VerticalLayout {
         return form;
     }
 
-    private Grid<Module> getModulesGrid(List<Module> modules, UnitService unitService) {
+    private Grid<Module> getModulesGrid(List<Module> modules) {
         var grid = new Grid<Module>();
         grid.addColumn(Module::getModuleType).setHeader("Type").setAutoWidth(true);
-        grid.addColumn(Module::getModuleName).setHeader("Name").setFlexGrow(1);
+        grid.addColumn(Module::getModuleName).setHeader("Name").setAutoWidth(true);
         grid.addColumn(Module::getValue).setHeader("Value").setFlexGrow(1);
-        grid.addComponentColumn(module -> getModuleSpecificComponent(module, unitService)).setFlexGrow(10);
+        grid.addComponentColumn(this::getModuleSpecificComponent).setFlexGrow(10);
         grid.setWidthFull();
         grid.setHeightByRows(true);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
@@ -99,38 +103,48 @@ public class UnitDetails extends VerticalLayout {
         return grid;
     }
 
-    private Component getModuleSpecificComponent(Module module, UnitService unitService) {
+    private Component getModuleSpecificComponent(Module module) {
         if (module.getModuleType().equals("relay")) {
-            return new Button("Switch", event -> changeRelayState(module, unitService));
+            return new Button("Switch", event -> changeRelayState(module));
         }
         return new Label("");
-
     }
 
-    private void changeRelayState(Module module, UnitService unitService) {
+    private void changeRelayState(Module module) {
         try {
             unitService.changeRelayStateFor(module);
-        } catch (ModuleStateChangeException e) {
-            showErrorNotification("Relay state cannot be changed: " + e.getMessage());
+        } catch (UnitUpdateException e) {
+            showNotification("Relay state cannot be changed: " + e.getMessage());
         }
     }
 
     private Grid<Event> getEventsGrid(List<Event> events) {
         var grid = new Grid<Event>();
-        //todo
-        // delete column
-        // modify column
-        // add button
         grid.addColumn(event -> event.getEventType()).setHeader("Type").setAutoWidth(true);
-        grid.addColumn(Event::getInfo).setHeader("Info").setFlexGrow(1);
         grid.addColumn(Event::getCronSchedule).setHeader("CRON").setFlexGrow(1);
+        grid.addColumn(Event::getInfo).setHeader("Info").setAutoWidth(true);
         grid.addColumn(e -> DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm")
                 .format(e.getLastUpdated())).setHeader("Last Updated").setFlexGrow(10);
+        grid.addComponentColumn(event -> new Button("Edit", e -> popUpEventEditor(event)));
+        grid.addComponentColumn(event -> new Button("Delete", e -> deleteEvent(event)));
         grid.setWidthFull();
         grid.setHeightByRows(true);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
+
         grid.setItems(events);
         return grid;
+    }
+
+    private void popUpEventEditor(Event selectedEvent) {
+        new EventEditor(selectedEvent, unitService).open();
+    }
+
+    private void deleteEvent(Event selectedEvent) {
+        try {
+            unitService.deleteScheduledEventFromUnit(selectedEvent);
+        } catch (UnitUpdateException e) {
+            showNotification("Cannot delete event: " + e.getMessage());
+        }
     }
 
 
@@ -146,7 +160,7 @@ public class UnitDetails extends VerticalLayout {
         return grid;
     }
 
-    private void showErrorNotification(String message) {
+    private void showNotification(String message) {
         var error = new Dialog();
         error.add(new Label(message));
         error.setCloseOnEsc(true);
