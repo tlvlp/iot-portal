@@ -23,8 +23,8 @@ public class Properties {
 //    @Value("${API_GATEWAY_API_REQUEST_GLOBAL_UNIT_STATUS}")
 //    private String API_GATEWAY_API_REQUEST_GLOBAL_UNIT_STATUS;
 //
-//    @Value("${API_GATEWAY_API_UNIT_MODULE_CONTROL}")
-//    private String API_GATEWAY_API_UNIT_MODULE_CONTROL;
+    @Value("${API_GATEWAY_API_UNIT_MODULE_CONTROL}")
+    private String API_GATEWAY_API_UNIT_MODULE_CONTROL;
 //
 //    @Value("${API_GATEWAY_API_ADD_SCHEDULED_EVENT_TO_UNIT}")
 //    private String API_GATEWAY_API_ADD_SCHEDULED_EVENT_TO_UNIT;
@@ -55,9 +55,9 @@ public class Properties {
 //        return API_GATEWAY_API_REQUEST_GLOBAL_UNIT_STATUS;
 //    }
 //
-//    public String getAPI_GATEWAY_API_UNIT_MODULE_CONTROL() {
-//        return API_GATEWAY_API_UNIT_MODULE_CONTROL;
-//    }
+public String getAPI_GATEWAY_API_UNIT_MODULE_CONTROL() {
+    return API_GATEWAY_API_UNIT_MODULE_CONTROL;
+}
 //
 //    public String getAPI_GATEWAY_API_ADD_SCHEDULED_EVENT_TO_UNIT() {
 //        return API_GATEWAY_API_ADD_SCHEDULED_EVENT_TO_UNIT;

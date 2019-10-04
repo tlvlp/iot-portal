@@ -3,16 +3,12 @@ package com.tlvlp.iot.server.portal.services;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-enum Type {
-    RELAY
-}
-
 public class Event {
 
     private String eventID;
     private String cronSchedule;
     private String targetURL;
-    private Type type;
+    private EventType eventType;
     private String info;
     private LocalDateTime lastUpdated;
     private Map payload;
@@ -23,6 +19,7 @@ public class Event {
                 "eventID='" + eventID + '\'' +
                 ", cronSchedule='" + cronSchedule + '\'' +
                 ", targetURL='" + targetURL + '\'' +
+                ", type=" + eventType +
                 ", info='" + info + '\'' +
                 ", lastUpdated=" + lastUpdated +
                 ", payload=" + payload +
@@ -53,6 +50,15 @@ public class Event {
 
     public Event setTargetURL(String targetURL) {
         this.targetURL = targetURL;
+        return this;
+    }
+
+    public EventType getEventType() {
+        return eventType;
+    }
+
+    public Event setEventType(EventType eventType) {
+        this.eventType = eventType;
         return this;
     }
 

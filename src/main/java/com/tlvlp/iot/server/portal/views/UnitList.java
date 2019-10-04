@@ -1,64 +1,69 @@
 package com.tlvlp.iot.server.portal.views;
 
-import com.tlvlp.iot.server.portal.services.*;
 import com.tlvlp.iot.server.portal.services.Module;
+import com.tlvlp.iot.server.portal.services.Unit;
+import com.tlvlp.iot.server.portal.services.UnitRetrievalException;
+import com.tlvlp.iot.server.portal.services.UnitService;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-@Route(value = "units", layout = MainView.class)
+@Route(value = "", layout = MainView.class)
 @PageTitle("tlvlp IoT Portal - Unit List")
-public class UnitList extends VerticalLayout {
+public class UnitList extends VerticalLayout implements AfterNavigationObserver {
 
+    private Grid<Unit> grid;
+    private UnitService unitService;
 
 
     public UnitList(UnitService unitService) {
-        try {
-            var grid = new Grid<Unit>();
-            grid.addColumn(Unit::getProject).setHeader("Project")
-                    .setFlexGrow(1)
-                    .setSortable(true);
-            grid.addColumn(Unit::getName).setHeader("Unit")
-                    .setFlexGrow(1)
-                    .setSortable(true);
-            grid.addColumn(unit -> unit.getModules().size()).setHeader("Modules")
-                    .setFlexGrow(1)
-                    .setSortable(true);
-            grid.addColumn(unit -> unit.getScheduledEventIDs().size()).setHeader("Events")
-                    .setFlexGrow(1)
-                    .setSortable(true);
-            grid.addColumn(u -> u.getActive() ? "Yes" : "No").setHeader("Active")
-                    .setFlexGrow(1)
-                    .setSortable(true);
-            grid.addColumn(u -> DateTimeFormatter.ofPattern("yyyy-mm-dd hh:mm").format(u.getLastSeen())).setHeader("Last Seen")
-                    .setFlexGrow(1)
-                    .setAutoWidth(true)
-                    .setSortable(true);
 
-            grid.setWidthFull();
-            grid.setHeightByRows(true);
+        this.unitService = unitService;
 
-            grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid = new Grid<>();
+        grid.addColumn(Unit::getProject).setHeader("Project")
+                .setFlexGrow(1)
+                .setSortable(true);
+        grid.addColumn(Unit::getName).setHeader("Unit")
+                .setFlexGrow(1)
+                .setSortable(true);
+        grid.addColumn(unit -> unit.getModules().size()).setHeader("Modules")
+                .setFlexGrow(1)
+                .setSortable(true);
+        grid.addColumn(unit -> unit.getScheduledEventIDs().size()).setHeader("Events")
+                .setFlexGrow(1)
+                .setSortable(true);
+        grid.addColumn(u -> u.getActive() ? "Yes" : "No").setHeader("Active")
+                .setFlexGrow(1)
+                .setSortable(true);
+        grid.addColumn(u -> DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm").format(u.getLastSeen())).setHeader("Last Seen")
+                .setFlexGrow(1)
+                .setAutoWidth(true)
+                .setSortable(true);
 
-            grid.setMultiSort(true);
-            grid.setItemDetailsRenderer(new ComponentRenderer<>(this::getUnitPreview));
-            grid.setSelectionMode(Grid.SelectionMode.NONE);
-            grid.setItems(unitService.getUnitList());
+        grid.setWidthFull();
+        grid.setHeightByRows(true);
 
-            add(grid);
-        } catch (UnitRetrievalException e) {
-            //todo
-            // error popup
-        }
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+
+        grid.setMultiSort(true);
+        grid.setItemDetailsRenderer(new ComponentRenderer<>(this::getUnitPreview));
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+
+        add(grid);
     }
 
     private HorizontalLayout getUnitPreview(Unit selectedUnit) {
@@ -80,4 +85,24 @@ public class UnitList extends VerticalLayout {
         return new HorizontalLayout(detailsButton, moduleGrid);
     }
 
+    private void showErrorNotification(String message) {
+        var error = new Dialog();
+        error.add(new Label(message));
+        error.setCloseOnEsc(true);
+        error.setCloseOnOutsideClick(true);
+        error.open();
+    }
+
+    private void refreshGridData() throws UnitRetrievalException {
+        grid.setItems(unitService.getUnitListWithModules());
+    }
+
+    @Override
+    public void afterNavigation(AfterNavigationEvent event) {
+        try {
+            refreshGridData();
+        } catch (UnitRetrievalException e) {
+            showErrorNotification("Unit list cannot be retrieved: " + e.getMessage());
+        }
+    }
 }
