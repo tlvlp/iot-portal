@@ -3,15 +3,12 @@ package com.tlvlp.iot.server.portal.services;
 import com.tlvlp.iot.server.portal.config.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -82,6 +79,8 @@ public class UnitService {
 //    }
 
 //    public void changeRelayStateFor(Module module) throws ModuleStateChangeException {
+//        var currentState = module.getValue();
+//        module.setValue(currentState == 0d ? 1d : 0d);
 //        try {
 //            restTemplate.postForEntity(
 //                    String.format("http://%s:%s%s?unitID=%s&timeFrom=%s&timeTo=%s",
@@ -99,7 +98,7 @@ public class UnitService {
 
     //TODO: REMOVE TEST DATA
     public void changeRelayStateFor(Module module) throws ModuleStateChangeException {
-
+        log.info("CHANGING RELAY STATE");
     }
 
     //TODO: REMOVE TEST DATA
@@ -114,19 +113,26 @@ public class UnitService {
                                 .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
                                 .setScheduledEventIDs(List.of())
                                 .setModules(List.of(
-                                        new Module().setModuleID("light|growlight1")
+                                        new Module().setModuleID("light|growlightpercent")
                                                 .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
                                                 .setValue((double) i),
-                                        new Module().setModuleID("light|growlight2")
+                                        new Module().setModuleID("relay|growlightrelay")
                                                 .setUnitID(i%2 ==0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
-                                                .setValue((double) i-1))))
+                                                .setValue(1d))))
                         .collect(Collectors.toList()));
 
         var unitSelected = unitList.stream().filter(unit -> unit.getUnitID().equals(unitID)).findFirst().orElseGet(Unit::new);
 
-        return unitSelected
-                .setScheduledEvents(List.of(new Event()))
+        unitSelected
+                .setScheduledEvents(List.of(new Event()
+                        .setCronSchedule("* * * * *")
+                        .setEventID("eventID")
+                        .setInfo("Test event").setLastUpdated(LocalDateTime.now())
+                        .setPayload(Map.of("pay", "load")).setTargetURL("http://test")))
                 .setLogs(List.of(new Log().setArrived(LocalDateTime.now().minusHours(10)).setLogEntry("Something interesting happened")));
+
+        System.out.println("UNITSELECTED: " + unitSelected);//TODO remove
+        return unitSelected;
     }
 
     //TODO: REMOVE TEST DATA
