@@ -15,7 +15,7 @@ import com.vaadin.flow.data.binder.Binder;
 
 public class EventEditor extends Dialog {
 
-    public EventEditor(Event event, UnitService unitService) {
+    public EventEditor(Event event, UnitService unitService, UnitDetails unitDetails) {
 
         setCloseOnOutsideClick(false);
         setCloseOnEsc(true);
@@ -47,6 +47,7 @@ public class EventEditor extends Dialog {
                     throw new UnitUpdateException("Event type cannot be UNKNOWN!");
                 }
                 unitService.addScheduledEventToUnit(event);
+                unitDetails.initializePageData();
                 close();
             } catch (UnitUpdateException err) {
                 errorLabel.setText("Cannot save event: " + err.getMessage());

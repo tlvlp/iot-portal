@@ -27,11 +27,14 @@ public class UnitDetails extends VerticalLayout {
 
     public UnitDetails(UnitService unitService) {
         this.unitService = unitService;
+        initializePageData();
+    }
+
+    public void initializePageData() {
         try {
             var unitID = (String) ComponentUtil.getData(UI.getCurrent(), "unitID");
             Unit unitWithDetails = unitService.getUnitWithSchedulesAndLogs(unitID);
             add(
-                    //TODO - central refresh function (on pageload + successfull update + add refresh button)
                     getLabel("Unit Details:"),
                     getUnitDetailsForm(unitWithDetails),
                     getLabel("Generate Report:"),
@@ -136,7 +139,7 @@ public class UnitDetails extends VerticalLayout {
     }
 
     private void popUpEventEditor(Event selectedEvent) {
-        new EventEditor(selectedEvent, unitService).open();
+        new EventEditor(selectedEvent, unitService, this).open();
     }
 
     private void deleteEvent(Event selectedEvent) {
