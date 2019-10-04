@@ -1,6 +1,7 @@
 package com.tlvlp.iot.server.portal.services;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 public class Unit {
@@ -11,8 +12,10 @@ public class Unit {
     private Boolean active;
     private String controlTopic;
     private LocalDateTime lastSeen;
-    private Set<Module> modules;
-    private Set<String> scheduledEvents;
+    private List<Module> modules;
+    private List<String> scheduledEventIDs;
+    private List<Event> scheduledEvents;
+    private List<Log> logs;
 
     @Override
     public String toString() {
@@ -24,7 +27,9 @@ public class Unit {
                 ", controlTopic='" + controlTopic + '\'' +
                 ", lastSeen=" + lastSeen +
                 ", modules=" + modules +
+                ", scheduledEventIDs=" + scheduledEventIDs +
                 ", scheduledEvents=" + scheduledEvents +
+                ", logs=" + logs +
                 '}';
     }
 
@@ -55,7 +60,7 @@ public class Unit {
         return this;
     }
 
-    public Boolean isActive() {
+    public Boolean getActive() {
         return active;
     }
 
@@ -82,21 +87,39 @@ public class Unit {
         return this;
     }
 
-    public Set<Module> getModules() {
+    public List<Module> getModules() {
         return modules;
     }
 
-    public Unit setModules(Set<Module> modules) {
+    public Unit setModules(List<Module> modules) {
         this.modules = modules;
         return this;
     }
 
-    public Set<String> getScheduledEvents() {
+    public List<String> getScheduledEventIDs() {
+        return scheduledEventIDs;
+    }
+
+    public Unit setScheduledEventIDs(List<String> scheduledEventIDs) {
+        this.scheduledEventIDs = scheduledEventIDs;
+        return this;
+    }
+
+    public List<Event> getScheduledEvents() {
         return scheduledEvents;
     }
 
-    public Unit setScheduledEvents(Set<String> scheduledEvents) {
+    public Unit setScheduledEvents(List<Event> scheduledEvents) {
         this.scheduledEvents = scheduledEvents;
+        return this;
+    }
+
+    public List<Log> getLogs() {
+        return logs;
+    }
+
+    public Unit setLogs(List<Log> logs) {
+        this.logs = logs;
         return this;
     }
 }

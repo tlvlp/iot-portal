@@ -1,8 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
+import com.tlvlp.iot.server.portal.services.*;
 import com.tlvlp.iot.server.portal.services.Module;
-import com.tlvlp.iot.server.portal.services.Unit;
-import com.tlvlp.iot.server.portal.services.UnitListService;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -20,46 +19,51 @@ import java.util.ArrayList;
 @PageTitle("tlvlp IoT Portal - Unit List")
 public class UnitList extends VerticalLayout {
 
-    public UnitList(UnitListService unitListService) {
 
-        var grid = new Grid<Unit>();
-        grid.addColumn(Unit::getProject).setHeader("Project")
-                .setFlexGrow(1)
-                .setSortable(true);
-        grid.addColumn(Unit::getName).setHeader("Unit")
-                .setFlexGrow(1)
-                .setSortable(true);
-        grid.addColumn(unit -> unit.getModules().size()).setHeader("Modules")
-                .setFlexGrow(1)
-                .setSortable(true);
-        grid.addColumn(unit -> unit.getScheduledEvents().size()).setHeader("Events")
-                .setFlexGrow(1)
-                .setSortable(true);
-        grid.addColumn(u -> u.isActive() ? "Yes" : "No").setHeader("Active")
-                .setFlexGrow(1)
-                .setSortable(true);
-        grid.addColumn(u -> DateTimeFormatter.ofPattern("yyyy-mm-dd hh:mm").format(u.getLastSeen())).setHeader("Last Seen")
-                .setFlexGrow(1)
-                .setAutoWidth(true)
-                .setSortable(true);
 
-        grid.setWidthFull();
-        grid.setHeightByRows(true);
+    public UnitList(UnitService unitService) {
+        try {
+            var grid = new Grid<Unit>();
+            grid.addColumn(Unit::getProject).setHeader("Project")
+                    .setFlexGrow(1)
+                    .setSortable(true);
+            grid.addColumn(Unit::getName).setHeader("Unit")
+                    .setFlexGrow(1)
+                    .setSortable(true);
+            grid.addColumn(unit -> unit.getModules().size()).setHeader("Modules")
+                    .setFlexGrow(1)
+                    .setSortable(true);
+            grid.addColumn(unit -> unit.getScheduledEventIDs().size()).setHeader("Events")
+                    .setFlexGrow(1)
+                    .setSortable(true);
+            grid.addColumn(u -> u.getActive() ? "Yes" : "No").setHeader("Active")
+                    .setFlexGrow(1)
+                    .setSortable(true);
+            grid.addColumn(u -> DateTimeFormatter.ofPattern("yyyy-mm-dd hh:mm").format(u.getLastSeen())).setHeader("Last Seen")
+                    .setFlexGrow(1)
+                    .setAutoWidth(true)
+                    .setSortable(true);
 
-        grid.setSelectionMode(Grid.SelectionMode.NONE);
+            grid.setWidthFull();
+            grid.setHeightByRows(true);
 
-        grid.setMultiSort(true);
-        grid.setItemDetailsRenderer(new ComponentRenderer<>(this::getUnitPreview));
-        grid.setSelectionMode(Grid.SelectionMode.NONE);
-        grid.setItems(unitListService.getUnitList());
+            grid.setSelectionMode(Grid.SelectionMode.NONE);
 
-        add(grid);
+            grid.setMultiSort(true);
+            grid.setItemDetailsRenderer(new ComponentRenderer<>(this::getUnitPreview));
+            grid.setSelectionMode(Grid.SelectionMode.NONE);
+            grid.setItems(unitService.getUnitList());
+
+            add(grid);
+        } catch (UnitRetrievalException e) {
+            //todo
+            // error popup
+        }
     }
 
     private HorizontalLayout getUnitPreview(Unit selectedUnit) {
-
-        var detailsButton = new Button("Details", e -> {
-            ComponentUtil.setData(UI.getCurrent(), "selectedUnit", selectedUnit);
+        var detailsButton = new Button("Details", event -> {
+            ComponentUtil.setData(UI.getCurrent(), "unitID", selectedUnit.getUnitID());
             UI.getCurrent().navigate(UnitDetails.class);
         });
         detailsButton.setAutofocus(true);
