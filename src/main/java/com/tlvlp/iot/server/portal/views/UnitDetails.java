@@ -1,9 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
-import com.tlvlp.iot.server.portal.entities.Event;
-import com.tlvlp.iot.server.portal.entities.Log;
 import com.tlvlp.iot.server.portal.entities.Module;
-import com.tlvlp.iot.server.portal.entities.Unit;
+import com.tlvlp.iot.server.portal.entities.*;
 import com.tlvlp.iot.server.portal.services.UnitRetrievalException;
 import com.tlvlp.iot.server.portal.services.UnitService;
 import com.tlvlp.iot.server.portal.services.UnitUpdateException;
@@ -20,15 +18,21 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Route(value = "unit-details", layout = MainView.class)
 @PageTitle("tlvlp IoT Portal - Unit Details")
 public class UnitDetails extends VerticalLayout {
 
+    private static final Logger log = LoggerFactory.getLogger(UnitDetails.class);
     private UnitService unitService;
 
     public UnitDetails(UnitService unitService) {
@@ -38,23 +42,30 @@ public class UnitDetails extends VerticalLayout {
 
     public void initializePageData() {
         try {
-            var unitID = Optional.of((String) ComponentUtil.getData(UI.getCurrent(), "unitID"))
-                    .orElseThrow(() -> new UnitRetrievalException("Unit ID not passed!"));
-            var unitWithDetails = Optional.of(unitService.getUnitWithSchedulesAndLogs(unitID))
-                    .orElseThrow(() -> new UnitRetrievalException("Unit not found at the server"));
+            var unitID = (String) ComponentUtil.getData(UI.getCurrent(), "unitID");
+            if (unitID == null) {
+                throw new UnitRetrievalException("Unit ID was not passed!");
+            }
+            var unitWithDetails = unitService.getUnitWithSchedulesAndLogs(unitID);
+            if (unitWithDetails == null) {
+                throw new UnitRetrievalException("Unit not found at the server");
+            }
             add(
                     getLabel("Unit Details:"),
                     getUnitDetailsForm(unitWithDetails),
-                    getLabel("Generate Report:"),
-                    getReportingForm(),
                     getLabel("Modules:"),
                     getModulesGrid(unitWithDetails.getModules()),
                     getLabel("Scheduled Events:"),
                     getEventsGrid(unitWithDetails.getScheduledEvents()),
                     getLabel("Unit Logs (last 7 days)"),
-                    getLogsGrid(unitWithDetails.getLogs()));
-        } catch (UnitRetrievalException | RuntimeException e) {
-            showNotification("Unit details cannot be retrieved: " + e.getMessage());
+                    getLogsGrid(unitWithDetails.getLogs()),
+                    getLabel("Generate Report:"),
+                    getReportingForm(unitWithDetails));
+        } catch (Exception e) {
+            e.printStackTrace();
+            String err = "Unit details cannot be retrieved: ";
+            log.error(err);
+            showNotification(err);
             UI.getCurrent().navigate(UnitList.class);
         }
     }
@@ -90,15 +101,25 @@ public class UnitDetails extends VerticalLayout {
         return form;
     }
 
-    private FormLayout getReportingForm() {
-        var form = new FormLayout();
-        //TODO
-        // use standalone reporting form (create reusable separate class)
-        // hide & auto populate evident details
-        // save form details to ComponentUtil
-        // route to reporting
+    private VerticalLayout getReportingForm(Unit unit) {
+        if (unit.getModules().isEmpty()) {
+            return new VerticalLayout(new Label("Cannot generate reports for Unit: No modules found"));
+        }
+        var form = new ReportingForm(List.of(unit));
+        var unitQuery = new ReportingQuery()
+                .setUnit(unit)
+                .setModule(unit.getModules().get(0))
+                .setRequestedScopes(Set.of("DAYS"))
+                .setTimeFrom(LocalDateTime.now().minusDays(7).truncatedTo(DAYS))
+                .setTimeTo(LocalDateTime.now().truncatedTo(DAYS));
+        form.setQuery(unitQuery);
 
-        return form;
+        var reportingButton = new Button("Generate Reports", event -> {
+            ComponentUtil.setData(UI.getCurrent(), ReportingQuery.class, form.getQuery());
+            UI.getCurrent().navigate(Reporting.class);
+        });
+
+        return new VerticalLayout(form, reportingButton);
     }
 
     private Grid<Module> getModulesGrid(List<Module> modules) {
@@ -141,7 +162,6 @@ public class UnitDetails extends VerticalLayout {
         grid.setWidthFull();
         grid.setHeightByRows(true);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
-
         grid.setItems(events);
         return grid;
     }

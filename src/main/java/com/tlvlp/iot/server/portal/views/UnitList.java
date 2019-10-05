@@ -85,7 +85,7 @@ public class UnitList extends VerticalLayout implements AfterNavigationObserver 
         return new HorizontalLayout(detailsButton, moduleGrid);
     }
 
-    private void showErrorNotification(String message) {
+    private void showNotification(String message) {
         var error = new Dialog();
         error.add(new Label(message));
         error.setCloseOnEsc(true);
@@ -102,7 +102,7 @@ public class UnitList extends VerticalLayout implements AfterNavigationObserver 
         try {
             refreshGridData();
         } catch (UnitRetrievalException e) {
-            showErrorNotification("Unit list cannot be retrieved: " + e.getMessage());
+            showNotification("Unit list cannot be retrieved: " + e.getMessage());
         }
     }
 }

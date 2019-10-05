@@ -162,28 +162,6 @@ public class UnitService {
 //        }
 //    }
 
-    //TODO Parse Map<ChronoUnit, TreeMap<String, Double>> into ReportingData??
-    public ReportingData getReports(ReportingQuery reportingQuery) throws ReportingException {
-        try {
-            return restTemplate.getForObject(
-                    String.format("http://%s:%s%s?unitID=%s&moduleID=%s&timeFrom=%s&timeTo=%s&requestedScopes=%s",
-                            properties.getAPI_GATEWAY_NAME(),
-                            properties.getAPI_GATEWAY_PORT(),
-                            properties.getAPI_GATEWAY_API_GET_REPORTS_FOR_UNIT_MODULE(),
-                            reportingQuery.getUnitID(),
-                            reportingQuery.getModuleID(),
-                            reportingQuery.getTimeFrom(),
-                            reportingQuery.getTimeTo(),
-                            String.join(",", reportingQuery.getRequestedScopes())),
-                    Map.class);
-        } catch (Exception e) {
-            var err = "Problem with adding Event to Unit: " + e.getMessage();
-            log.error(err);
-            throw new ReportingException(err);
-        }
-
-    }
-
     //TODO: REMOVE TEST METHOD
     public void changeRelayStateFor(Module module) throws UnitUpdateException {
         log.info("CHANGING RELAY STATE");
@@ -227,7 +205,7 @@ public class UnitService {
                                         .setUnitID(i % 2 == 0 ? "TestProject_Unit_" + i : "BazsalikOn_Unit_" + i)
                                         .setValue(1d))))
                 .map(this::updateUnitWithParsedModules)
-                .peek(unit -> log.info("GENERATING RAW UNIT: " + unit.toString()))
+//                .peek(unit -> log.info("GENERATING RAW UNIT: " + unit.toString()))
                 .collect(Collectors.toList());
     }
 
@@ -239,9 +217,5 @@ public class UnitService {
     //TODO: REMOVE TEST METHOD
     public void addScheduledEventToUnit(Event event) throws UnitUpdateException {
         System.out.println("SAVE EVENT: " + event);
-    }
-
-    //TODO: REMOVE TEST METHOD
-    public Object getReports(ReportingQuery reportingQuery) throws ReportingException {
     }
 }

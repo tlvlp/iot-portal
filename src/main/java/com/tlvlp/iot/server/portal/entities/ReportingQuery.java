@@ -5,8 +5,8 @@ import java.util.Set;
 
 public class ReportingQuery {
 
-    private String unitID;
-    private String moduleID;
+    private Unit unit;
+    private Module module;
     private LocalDateTime timeFrom;
     private LocalDateTime timeTo;
     private Set<String> requestedScopes;
@@ -14,29 +14,29 @@ public class ReportingQuery {
     @Override
     public String toString() {
         return "ReportingQuery{" +
-                "unitID='" + unitID + '\'' +
-                ", moduleID='" + moduleID + '\'' +
+                "unit=" + unit +
+                ", module=" + module +
                 ", timeFrom=" + timeFrom +
                 ", timeTo=" + timeTo +
                 ", requestedScopes=" + requestedScopes +
                 '}';
     }
 
-    public String getUnitID() {
-        return unitID;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public ReportingQuery setUnitID(String unitID) {
-        this.unitID = unitID;
+    public ReportingQuery setUnit(Unit unit) {
+        this.unit = unit;
         return this;
     }
 
-    public String getModuleID() {
-        return moduleID;
+    public Module getModule() {
+        return module;
     }
 
-    public ReportingQuery setModuleID(String moduleID) {
-        this.moduleID = moduleID;
+    public ReportingQuery setModule(Module module) {
+        this.module = module;
         return this;
     }
 
