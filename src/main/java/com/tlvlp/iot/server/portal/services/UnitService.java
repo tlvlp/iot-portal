@@ -1,6 +1,8 @@
 package com.tlvlp.iot.server.portal.services;
 
 import com.tlvlp.iot.server.portal.config.Properties;
+import com.tlvlp.iot.server.portal.entities.Module;
+import com.tlvlp.iot.server.portal.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -160,6 +162,28 @@ public class UnitService {
 //        }
 //    }
 
+    //TODO Parse Map<ChronoUnit, TreeMap<String, Double>> into ReportingData??
+    public ReportingData getReports(ReportingQuery reportingQuery) throws ReportingException {
+        try {
+            return restTemplate.getForObject(
+                    String.format("http://%s:%s%s?unitID=%s&moduleID=%s&timeFrom=%s&timeTo=%s&requestedScopes=%s",
+                            properties.getAPI_GATEWAY_NAME(),
+                            properties.getAPI_GATEWAY_PORT(),
+                            properties.getAPI_GATEWAY_API_GET_REPORTS_FOR_UNIT_MODULE(),
+                            reportingQuery.getUnitID(),
+                            reportingQuery.getModuleID(),
+                            reportingQuery.getTimeFrom(),
+                            reportingQuery.getTimeTo(),
+                            String.join(",", reportingQuery.getRequestedScopes())),
+                    Map.class);
+        } catch (Exception e) {
+            var err = "Problem with adding Event to Unit: " + e.getMessage();
+            log.error(err);
+            throw new ReportingException(err);
+        }
+
+    }
+
     //TODO: REMOVE TEST METHOD
     public void changeRelayStateFor(Module module) throws UnitUpdateException {
         log.info("CHANGING RELAY STATE");
@@ -217,4 +241,7 @@ public class UnitService {
         System.out.println("SAVE EVENT: " + event);
     }
 
+    //TODO: REMOVE TEST METHOD
+    public Object getReports(ReportingQuery reportingQuery) throws ReportingException {
+    }
 }

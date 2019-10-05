@@ -1,7 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
-import com.tlvlp.iot.server.portal.services.Event;
-import com.tlvlp.iot.server.portal.services.EventType;
+import com.tlvlp.iot.server.portal.entities.Event;
+import com.tlvlp.iot.server.portal.entities.EventType;
 import com.tlvlp.iot.server.portal.services.UnitService;
 import com.tlvlp.iot.server.portal.services.UnitUpdateException;
 import com.vaadin.flow.component.button.Button;

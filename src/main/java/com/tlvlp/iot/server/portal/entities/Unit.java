@@ -1,8 +1,7 @@
-package com.tlvlp.iot.server.portal.services;
+package com.tlvlp.iot.server.portal.entities;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 public class Unit {
 

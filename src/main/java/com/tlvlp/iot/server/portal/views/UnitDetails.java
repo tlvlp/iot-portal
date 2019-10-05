@@ -1,7 +1,12 @@
 package com.tlvlp.iot.server.portal.views;
 
-import com.tlvlp.iot.server.portal.services.Module;
-import com.tlvlp.iot.server.portal.services.*;
+import com.tlvlp.iot.server.portal.entities.Event;
+import com.tlvlp.iot.server.portal.entities.Log;
+import com.tlvlp.iot.server.portal.entities.Module;
+import com.tlvlp.iot.server.portal.entities.Unit;
+import com.tlvlp.iot.server.portal.services.UnitRetrievalException;
+import com.tlvlp.iot.server.portal.services.UnitService;
+import com.tlvlp.iot.server.portal.services.UnitUpdateException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
@@ -18,6 +23,7 @@ import com.vaadin.flow.router.Route;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Route(value = "unit-details", layout = MainView.class)
 @PageTitle("tlvlp IoT Portal - Unit Details")
@@ -32,8 +38,10 @@ public class UnitDetails extends VerticalLayout {
 
     public void initializePageData() {
         try {
-            var unitID = (String) ComponentUtil.getData(UI.getCurrent(), "unitID");
-            Unit unitWithDetails = unitService.getUnitWithSchedulesAndLogs(unitID);
+            var unitID = Optional.of((String) ComponentUtil.getData(UI.getCurrent(), "unitID"))
+                    .orElseThrow(() -> new UnitRetrievalException("Unit ID not passed!"));
+            var unitWithDetails = Optional.of(unitService.getUnitWithSchedulesAndLogs(unitID))
+                    .orElseThrow(() -> new UnitRetrievalException("Unit not found at the server"));
             add(
                     getLabel("Unit Details:"),
                     getUnitDetailsForm(unitWithDetails),
