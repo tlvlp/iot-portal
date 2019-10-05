@@ -13,9 +13,9 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 
-public class EventEditor extends Dialog {
+public class UnitDetailsEventEditor extends Dialog {
 
-    public EventEditor(Event event, UnitService unitService, UnitDetails unitDetails) {
+    public UnitDetailsEventEditor(Event event, UnitService unitService, UnitDetails unitDetails) {
 
         setCloseOnOutsideClick(false);
         setCloseOnEsc(true);

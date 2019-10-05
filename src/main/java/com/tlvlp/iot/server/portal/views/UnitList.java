@@ -35,22 +35,16 @@ public class UnitList extends VerticalLayout implements AfterNavigationObserver 
 
         grid = new Grid<>();
         grid.addColumn(Unit::getProject).setHeader("Project")
-                .setFlexGrow(1)
+                .setAutoWidth(true)
                 .setSortable(true);
         grid.addColumn(Unit::getName).setHeader("Unit")
-                .setFlexGrow(1)
-                .setSortable(true);
-        grid.addColumn(unit -> unit.getModules().size()).setHeader("Modules")
-                .setFlexGrow(1)
-                .setSortable(true);
-        grid.addColumn(unit -> unit.getScheduledEventIDs().size()).setHeader("Events")
-                .setFlexGrow(1)
+                .setAutoWidth(true)
                 .setSortable(true);
         grid.addColumn(u -> u.getActive() ? "Yes" : "No").setHeader("Active")
                 .setFlexGrow(1)
                 .setSortable(true);
         grid.addColumn(u -> DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm").format(u.getLastSeen())).setHeader("Last Seen")
-                .setFlexGrow(1)
+                .setFlexGrow(10)
                 .setAutoWidth(true)
                 .setSortable(true);
 
@@ -76,7 +70,7 @@ public class UnitList extends VerticalLayout implements AfterNavigationObserver 
 
         var moduleGrid = new Grid<Module>();
         moduleGrid.addColumn(Module::getModuleType).setAutoWidth(true);
-        moduleGrid.addColumn(Module::getModuleName).setFlexGrow(1);
+        moduleGrid.addColumn(Module::getModuleName).setAutoWidth(true);
         moduleGrid.addColumn(Module::getValue).setFlexGrow(10);
         moduleGrid.setWidthFull();
         moduleGrid.setHeightByRows(true);

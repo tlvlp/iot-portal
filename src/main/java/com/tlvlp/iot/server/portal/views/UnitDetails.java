@@ -13,6 +13,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -50,15 +51,20 @@ public class UnitDetails extends VerticalLayout {
             if (unitWithDetails == null) {
                 throw new UnitRetrievalException("Unit not found at the server");
             }
+            removeAll();
             add(
                     getLabel("Unit Details:"),
                     getUnitDetailsForm(unitWithDetails),
+                    getSeparator(),
                     getLabel("Modules:"),
                     getModulesGrid(unitWithDetails.getModules()),
+                    getSeparator(),
                     getLabel("Scheduled Events:"),
                     getEventsGrid(unitWithDetails.getScheduledEvents()),
+                    getSeparator(),
                     getLabel("Unit Logs (last 7 days)"),
                     getLogsGrid(unitWithDetails.getLogs()),
+                    getSeparator(),
                     getLabel("Generate Report:"),
                     getReportingForm(unitWithDetails));
         } catch (Exception e) {
@@ -74,6 +80,12 @@ public class UnitDetails extends VerticalLayout {
         return new Label(text);
     }
 
+    private HorizontalLayout getSeparator() {
+        var separator = new HorizontalLayout();
+        separator.setHeight("2em");
+        return separator;
+    }
+
     private FormLayout getUnitDetailsForm(Unit unit) {
         var unitIDField = new TextField();
         var projectField = new TextField();
@@ -87,6 +99,7 @@ public class UnitDetails extends VerticalLayout {
         form.addFormItem(nameField, "Name");
         form.addFormItem(activeField, "Active");
         form.addFormItem(lastSeenField, "Last seen");
+        form.addFormItem(new Button("Refresh Data", event -> initializePageData()), "");
 
         var binder = new Binder<Unit>();
         binder.forField(unitIDField).bind(Unit::getUnitID, null);
@@ -167,7 +180,7 @@ public class UnitDetails extends VerticalLayout {
     }
 
     private void popUpEventEditor(Event selectedEvent) {
-        new EventEditor(selectedEvent, unitService, this).open();
+        new UnitDetailsEventEditor(selectedEvent, unitService, this).open();
     }
 
     private void deleteEvent(Event selectedEvent) {
