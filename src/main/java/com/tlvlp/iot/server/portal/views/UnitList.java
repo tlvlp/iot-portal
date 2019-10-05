@@ -1,7 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
-import com.tlvlp.iot.server.portal.services.Module;
-import com.tlvlp.iot.server.portal.services.Unit;
+import com.tlvlp.iot.server.portal.entities.Module;
+import com.tlvlp.iot.server.portal.entities.Unit;
 import com.tlvlp.iot.server.portal.services.UnitRetrievalException;
 import com.tlvlp.iot.server.portal.services.UnitService;
 import com.vaadin.flow.component.ComponentUtil;
