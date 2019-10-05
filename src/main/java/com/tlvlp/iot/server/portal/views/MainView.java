@@ -19,8 +19,8 @@ public class MainView extends VerticalLayout implements RouterLayout {
 
         var menuBar = new MenuBar();
         menuBar.addItem("Units", c -> UI.getCurrent().navigate(UnitList.class));
-        menuBar.addItem("Admin", c -> UI.getCurrent().navigate(Admin.class));
         menuBar.addItem("Reporting", c -> UI.getCurrent().navigate(Reporting.class));
+        menuBar.addItem("Admin", c -> UI.getCurrent().navigate(Admin.class));
         menuBar.addItem("Logout", c -> UI.getCurrent().navigate(Login.class));
 
         add(menuBar);
