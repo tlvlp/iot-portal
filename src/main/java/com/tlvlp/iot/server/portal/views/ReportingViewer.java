@@ -1,43 +1,39 @@
 package com.tlvlp.iot.server.portal.views;
 
+import com.tlvlp.iot.server.portal.entities.Average;
 import com.tlvlp.iot.server.portal.entities.ReportingQuery;
 import com.tlvlp.iot.server.portal.services.ReportingException;
 import com.tlvlp.iot.server.portal.services.ReportingService;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-import java.time.temporal.ChronoUnit;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
 public class ReportingViewer extends VerticalLayout {
 
     private ReportingService reportingService;
-    private Grid<Map<String, Double>> grid;
+    private Grid<Average> grid;
 
     public ReportingViewer(ReportingService reportingService) {
         this.reportingService = reportingService;
         grid = new Grid<>();
-
-
-        //todo grid structure
-
+        grid.addColumn(Average::getScope).setHeader("Scope")
+                .setSortable(true)
+                .setAutoWidth(true);
+        grid.addColumn(Average::getDate).setHeader("Date")
+                .setSortable(true)
+                .setAutoWidth(true);
+        grid.addColumn(Average::getValue).setHeader("Value")
+                .setSortable(true)
+                .setFlexGrow(10);
+        add(grid);
     }
 
     public void initializeData(ReportingQuery query) {
         try {
-            //todo load if present leave if not
-            Optional<Map<ChronoUnit, TreeMap<String, Double>>> reports =
-                    Optional.of(reportingService.getReports(query));
-
-            //todo init grid with
+            grid.setItems(reportingService.getReports(query));
         } catch (ReportingException | RuntimeException e) {
-            showNotification("Report details cannot be retrieved: " + e.getMessage());
-            UI.getCurrent().navigate(UnitList.class);
+            showNotification(e.getMessage());
         }
 
     }
