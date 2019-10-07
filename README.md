@@ -1,7 +1,7 @@
 # IoT Portal
 
 ## Service
-Part of the tlvlp IoT project's server side microservices.
+Part of the [tlvlp IoT project](https://github.com/tlvlp/iot-project-summary)'s server side microservices.
 
 This Dockerized SpringBoot-based service is responsible providing providing an interactive portal for the API Gateway:
 - Unit monitoring, reporting and interaction
@@ -17,8 +17,4 @@ Repository: [tlvlp/iot-portal](https://cloud.docker.com/repository/docker/tlvlp/
 
 ## Deployment
 - This service is currently designed as **stateless** and can have an arbitrary number of instances running per Docker Swarm Stack.
-- For settings and deployment details see the project's [deployment repository](https://gitlab.com/tlvlp/iot.server.deployment)
-
-## Server-side API
-Actual API endpoints are inherited from the project's [deployment repository](https://gitlab.com/tlvlp/iot.server.deployment) via environment variables.
-
+- For settings and deployment details see the project's [deployment repository](https://github.com/tlvlp/iot-server-deployment)
