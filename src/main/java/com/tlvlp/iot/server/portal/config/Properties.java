@@ -35,6 +35,22 @@ public class Properties {
 //    @Value("${API_GATEWAY_API_GET_REPORTS_FOR_UNIT_MODULE}")
 //    private String API_GATEWAY_API_GET_REPORTS_FOR_UNIT_MODULE;
 //
+//    @Value("${API_GATEWAY_API_AUTHENTICATE_USER}")
+//    private String API_GATEWAY_API_AUTHENTICATE_USER;
+//
+//    @Value("${API_GATEWAY_API_GET_ALL_USERS}")
+//    private String API_GATEWAY_API_GET_ALL_USERS;
+//
+//    @Value("${API_GATEWAY_API_SAVE_USER}")
+//    private String API_GATEWAY_API_SAVE_USER;
+//
+//    @Value("${API_GATEWAY_API_DELETE_USER}")
+//    private String API_GATEWAY_API_DELETE_USER;
+//
+//    @Value("${API_GATEWAY_API_GET_ROLES}")
+//    private String API_GATEWAY_API_GET_ROLES;
+//
+//
 //    public String getAPI_GATEWAY_NAME() {
 //        return API_GATEWAY_NAME;
 //    }
@@ -69,5 +85,26 @@ public String getAPI_GATEWAY_API_UNIT_MODULE_CONTROL() {
 //
 //    public String getAPI_GATEWAY_API_GET_REPORTS_FOR_UNIT_MODULE() {
 //        return API_GATEWAY_API_GET_REPORTS_FOR_UNIT_MODULE;
+//    }
+//
+//
+//    public String getAPI_GATEWAY_API_AUTHENTICATE_USER() {
+//        return API_GATEWAY_API_AUTHENTICATE_USER;
+//    }
+//
+//    public String getAPI_GATEWAY_API_GET_ALL_USERS() {
+//        return API_GATEWAY_API_GET_ALL_USERS;
+//    }
+//
+//    public String getAPI_GATEWAY_API_SAVE_USER() {
+//        return API_GATEWAY_API_SAVE_USER;
+//    }
+//
+//    public String getAPI_GATEWAY_API_DELETE_USER() {
+//        return API_GATEWAY_API_DELETE_USER;
+//    }
+//
+//    public String getAPI_GATEWAY_API_GET_ROLES() {
+//        return API_GATEWAY_API_GET_ROLES;
 //    }
 }
