@@ -22,7 +22,7 @@ import org.springframework.security.access.annotation.Secured;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-@Route(value = "unit-list", layout = Menu.class)
+@Route(value = "unit-list", layout = MainLayout.class)
 @PageTitle("tlvlp IoT Portal - Unit List")
 @Secured("ROLE_USER")
 public class UnitList extends VerticalLayout implements AfterNavigationObserver {

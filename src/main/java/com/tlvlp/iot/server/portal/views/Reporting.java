@@ -19,7 +19,7 @@ import org.springframework.security.access.annotation.Secured;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@Route(value = "reporting", layout = Menu.class)
+@Route(value = "reporting", layout = MainLayout.class)
 @PageTitle("tlvlp IoT Portal - Reporting")
 @Secured("ROLE_USER")
 public class Reporting extends VerticalLayout {

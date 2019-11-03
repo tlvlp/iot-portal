@@ -18,7 +18,7 @@ import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
 
-@Route(value = "admin", layout = Menu.class)
+@Route(value = "admin", layout = MainLayout.class)
 @PageTitle("tlvlp IoT Portal - Admin")
 @Secured("ROLE_ADMIN")
 public class Admin extends VerticalLayout implements AfterNavigationObserver {

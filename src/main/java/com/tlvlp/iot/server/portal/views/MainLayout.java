@@ -16,9 +16,9 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.security.access.annotation.Secured;
 
 @Secured("ROLE_USER")
-public class Menu extends VerticalLayout implements RouterLayout {
+public class MainLayout extends VerticalLayout implements RouterLayout {
 
-    public Menu() {
+    public MainLayout() {
 
         var menuBar = new MenuBar();
         menuBar.addItem("Units", c -> UI.getCurrent().navigate(UnitList.class));
