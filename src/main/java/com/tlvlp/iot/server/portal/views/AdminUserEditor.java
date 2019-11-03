@@ -1,7 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
 import com.tlvlp.iot.server.portal.entities.User;
-import com.tlvlp.iot.server.portal.services.AdminService;
+import com.tlvlp.iot.server.portal.services.UserAdminService;
 import com.tlvlp.iot.server.portal.services.UserAdminException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class AdminUserEditor extends Dialog {
 
-    public AdminUserEditor(User user, List<String> roles, AdminService adminService, Admin parent) {
+    public AdminUserEditor(User user, List<String> roles, UserAdminService adminService, Admin parent) {
 
         var isNewUser = false;
         if (user.getUserID() == null) {

@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class AdminService {
+public class UserAdminService {
 
-    private static final Logger log = LoggerFactory.getLogger(AdminService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserAdminService.class);
     private RestTemplate restTemplate;
     private Properties properties;
 
-    public AdminService(RestTemplate restTemplate, Properties properties) {
+    public UserAdminService(RestTemplate restTemplate, Properties properties) {
         this.restTemplate = restTemplate;
         this.properties = properties;
     }

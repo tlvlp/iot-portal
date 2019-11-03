@@ -21,6 +21,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.annotation.Secured;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,8 +30,9 @@ import java.util.Set;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
-@Route(value = "unit-details", layout = MainView.class)
+@Route(value = "unit-details", layout = Menu.class)
 @PageTitle("tlvlp IoT Portal - Unit Details")
+@Secured("ROLE_USER")
 public class UnitDetails extends VerticalLayout {
 
     private static final Logger log = LoggerFactory.getLogger(UnitDetails.class);

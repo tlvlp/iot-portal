@@ -17,12 +17,14 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.security.access.annotation.Secured;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-@Route(value = "", layout = MainView.class)
+@Route(value = "unit-list", layout = Menu.class)
 @PageTitle("tlvlp IoT Portal - Unit List")
+@Secured("ROLE_USER")
 public class UnitList extends VerticalLayout implements AfterNavigationObserver {
 
     private Grid<Unit> grid;

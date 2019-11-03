@@ -1,7 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
 import com.tlvlp.iot.server.portal.entities.User;
-import com.tlvlp.iot.server.portal.services.AdminService;
+import com.tlvlp.iot.server.portal.services.UserAdminService;
 import com.tlvlp.iot.server.portal.services.UserAdminException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -14,18 +14,20 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
 
-@Route(value = "admin", layout = MainView.class)
+@Route(value = "admin", layout = Menu.class)
 @PageTitle("tlvlp IoT Portal - Admin")
+@Secured("ROLE_ADMIN")
 public class Admin extends VerticalLayout implements AfterNavigationObserver {
 
-    private AdminService adminService;
+    private UserAdminService adminService;
     private Grid<User> grid;
     private List<String> roles;
 
-    public Admin(AdminService adminService) {
+    public Admin(UserAdminService adminService) {
         this.adminService = adminService;
         grid = new Grid<>();
         grid.addColumn(User::getUserID).setHeader("ID")
