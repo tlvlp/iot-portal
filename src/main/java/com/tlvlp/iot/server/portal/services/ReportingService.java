@@ -18,10 +18,10 @@ public class ReportingService {
     private RestTemplate restTemplate;
     private Properties properties;
 
-    public ReportingService(RestTemplate restTemplate, Properties properties) {
-        this.restTemplate = restTemplate;
-        this.properties = properties;
-    }
+//    public ReportingService(RestTemplate restTemplate, Properties properties) {
+//        this.restTemplate = restTemplate;
+//        this.properties = properties;
+//    }
 
 //    public List<Average> getReports(ReportingQuery reportingQuery) throws ReportingException {
 //        try {

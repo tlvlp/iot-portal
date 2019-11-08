@@ -12,31 +12,56 @@ import java.util.Set;
 
 @Service
 public class UserAdminService {
-
     private static final Logger log = LoggerFactory.getLogger(UserAdminService.class);
-    private RestTemplate restTemplate;
+
+    private RestTemplateBuilder restTemplateBuilder;
     private Properties properties;
 
-    public UserAdminService(RestTemplate restTemplate, Properties properties) {
-        this.restTemplate = restTemplate;
+    public UserAdminService(RestTemplateBuilder restTemplateBuilder, Properties properties) {
+        this.restTemplateBuilder = restTemplateBuilder;
         this.properties = properties;
     }
 
-//    public List<User> getAllUsers() throws UserAdminAcception {
-//        try {
-//            return restTemplate.getForObject(
-//                    String.format("http://%s:%s%s",
-//                            properties.getAPI_GATEWAY_NAME(),
-//                            properties.getAPI_GATEWAY_PORT(),
-//                            properties.getAPI_GATEWAY_API_GET_ALL_USERS()),
-//                    new ParameterizedTypeReference<List<User>>() {});
-//        } catch (Exception e) {
-//            var err = "Cannot retrieve users: " + e.getMessage();
-//            log.error(err);
-//            throw new UserAdminAcception(err);
-//        }
-//    }
+    public User getUserDetailsAfterAuthentication(String userID, String password) throws UserAdminException {
+        try {
+            return restTemplateBuilder
+                    .basicAuthentication(userID, password)
+                    .build()
+                    .getForObject(
+                            String.format("https://%s:%s%s",
+                                    properties.getAPI_GATEWAY_NAME(),
+                                    properties.getAPI_GATEWAY_PORT_TLS(),
+                                    properties.getAPI_GATEWAY_API_AUTHENTICATE_USER()),
+                            User.class);
+        } catch (Exception e) {
+            var err = "Cannot retrieve users: " + e.getMessage();
+            log.error(err);
+            throw new UserAdminException(err);
+        }
+    }
 
+    public List<User> getAllUsers() throws UserAdminException {
+        try {
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            return restTemplateBuilder
+                    .basicAuthentication(auth.getName(), auth.getCredentials().toString())
+                    .build()
+                    .exchange(
+                            String.format("https://%s:%s%s",
+                                    properties.getAPI_GATEWAY_NAME(),
+                                    properties.getAPI_GATEWAY_PORT_TLS(),
+                                    properties.getAPI_GATEWAY_API_GET_ALL_USERS()),
+                            HttpMethod.GET,
+                            null,
+                            new ParameterizedTypeReference<List<User>>() {
+                            })
+                    .getBody();
+        } catch (Exception e) {
+            var err = "Cannot retrieve users: " + e.getMessage();
+            log.error(err);
+            throw new UserAdminException(err);
+        }
+    }
 //    public List<String> getRoles() throws UserAdminAcception {
 //        try {
 //            return restTemplate.getForObject(
@@ -50,6 +75,7 @@ public class UserAdminService {
 //            log.error(err);
 //            throw new UserAdminAcception(err);
 //        }
+
 //    }
 
 //    public void deleteUser(User user) throws UserAdminAcception {
@@ -66,8 +92,8 @@ public class UserAdminService {
 //            log.error(err);
 //            throw new UserAdminAcception(err);
 //        }
-//    }
 
+//    }
     //    public void saveUser(User user) throws UserAdminAcception {
 //        try {
 //            restTemplate.postForEntity(

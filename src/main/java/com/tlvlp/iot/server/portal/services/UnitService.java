@@ -6,7 +6,6 @@ import com.tlvlp.iot.server.portal.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,11 +17,9 @@ import java.util.stream.IntStream;
 public class UnitService {
 
     private static final Logger log = LoggerFactory.getLogger(UnitService.class);
-    private RestTemplate restTemplate;
     private Properties properties;
 
-    public UnitService(RestTemplate restTemplate, Properties properties) {
-        this.restTemplate = restTemplate;
+    public UnitService(Properties properties) {
         this.properties = properties;
     }
 

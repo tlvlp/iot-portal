@@ -3,16 +3,13 @@ package com.tlvlp.iot.server.portal.security;
 import com.tlvlp.iot.server.portal.views.LoginView;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
  * Configures spring security, doing the following:
@@ -30,7 +27,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private static final String LOGIN_URL = "/" + LoginView.ROUTE;
 	private static final String LOGOUT_SUCCESS_URL = "/" + LoginView.ROUTE;
 
-	@Override
+    private BackendAuthenticationProvider authProvider;
+
+    public SecurityConfiguration(BackendAuthenticationProvider authProvider) {
+        this.authProvider = authProvider;
+    }
+
+    @Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 				.csrf().disable()
@@ -48,25 +51,31 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
 	}
 
-	@Bean
-	@Override
-	public UserDetailsService userDetailsService() {
-		// typical logged in user with some privileges
-		UserDetails normalUser =
-				User.withUsername("user")
-						.password(passwordEncoder().encode("pass"))
-						.roles("USER")
-						.build();
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authProvider)
+                .eraseCredentials(false);
+    }
 
-		// admin user with all privileges
-		UserDetails adminUser =
-				User.withUsername("admin")
-						.password(passwordEncoder().encode("pass"))
-						.roles("USER", "ADMIN")
-						.build();
-
-		return new InMemoryUserDetailsManager(normalUser, adminUser);
-	}
+//	@Bean
+//	@Override
+//	public UserDetailsService userDetailsService() {
+//		// typical logged in user with some privileges
+//		UserDetails normalUser =
+//				User.withUsername("user")
+//						.password(passwordEncoder().encode("pass"))
+//						.roles("USER")
+//						.build();
+//
+//		// admin user with all privileges
+//		UserDetails adminUser =
+//				User.withUsername("admin")
+//						.password(passwordEncoder().encode("pass"))
+//						.roles("USER", "ADMIN")
+//						.build();
+//
+//		return new InMemoryUserDetailsManager(normalUser, adminUser);
+//	}
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
