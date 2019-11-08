@@ -1,7 +1,6 @@
 package com.tlvlp.iot.server.portal.views;
 
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginOverlay;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -19,7 +18,7 @@ public class LoginView extends VerticalLayout {
         login.setAction("login");
         login.setOpened(true);
         login.setTitle("tlvlp IoT Portal");
-        login.setDescription("Login Overlay Example");
+        login.setDescription("");
         getElement().appendChild(login.getElement());
     }
 

@@ -2,7 +2,7 @@ package com.tlvlp.iot.server.portal.entities;
 
 import java.time.LocalDateTime;
 
-public class Log {
+public class UnitLog {
 
     private LocalDateTime arrived;
     private String logEntry;
@@ -19,7 +19,7 @@ public class Log {
         return arrived;
     }
 
-    public Log setArrived(LocalDateTime arrived) {
+    public UnitLog setArrived(LocalDateTime arrived) {
         this.arrived = arrived;
         return this;
     }
@@ -28,7 +28,7 @@ public class Log {
         return logEntry;
     }
 
-    public Log setLogEntry(String logEntry) {
+    public UnitLog setLogEntry(String logEntry) {
         this.logEntry = logEntry;
         return this;
     }

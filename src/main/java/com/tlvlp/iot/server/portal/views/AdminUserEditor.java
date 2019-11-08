@@ -1,31 +1,28 @@
 package com.tlvlp.iot.server.portal.views;
 
 import com.tlvlp.iot.server.portal.entities.User;
-import com.tlvlp.iot.server.portal.services.UserAdminService;
 import com.tlvlp.iot.server.portal.services.UserAdminException;
+import com.tlvlp.iot.server.portal.services.UserAdminService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.validator.EmailValidator;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 
-import javax.validation.Validation;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class AdminUserEditor extends Dialog {
 
     public AdminUserEditor(User user, List<String> roles, UserAdminService adminService, Admin parent) {
 
-        var isNewUser = false;
-        if (user.getUserID() == null) {
-            isNewUser = true;
-        }
+        var isUserNew = user.getUserID() == null;
 
         setCloseOnOutsideClick(false);
         setCloseOnEsc(true);
@@ -36,8 +33,8 @@ public class AdminUserEditor extends Dialog {
         firstNameField.setRequired(true);
         var lastNameField = new TextField();
         lastNameField.setRequired(true);
-        var passwordField = new TextField();
-        passwordField.setPlaceholder("Only for password update");
+        var passwordField = new PasswordField();
+        passwordField.setPlaceholder("only for updates!");
         var emailField = new TextField();
         emailField.setRequired(true);
         var activeSelector = new Select<Boolean>();
@@ -46,7 +43,6 @@ public class AdminUserEditor extends Dialog {
         activeSelector.setEmptySelectionAllowed(false);
         var roleSelector = new CheckboxGroup<String>();
         roleSelector.setItems(roles);
-        roleSelector.setValue(Set.of("USER"));
         roleSelector.setRequired(true);
 
         var form = new FormLayout();
@@ -59,29 +55,43 @@ public class AdminUserEditor extends Dialog {
         form.addFormItem(roleSelector, "Roles");
 
         var binder = new Binder<User>();
-        binder.forField(userIDField).bind(User::getUserID, isNewUser ? User::setUserID : null);
-        binder.forField(passwordField).bind(User::getPassword, User::setPassword);
-        binder.forField(firstNameField).bind(User::getFirstName, User::setFirstName);
-        binder.forField(lastNameField).bind(User::getLastName, User::setLastName);
-        binder.forField(emailField).bind(User::getEmail, User::setEmail);
-        binder.forField(activeSelector).bind(User::getActive, User::setActive);
-        binder.forField(roleSelector).bind(User::getRoles, User::setRoles);
+        binder.forField(userIDField)
+                .withValidator(new StringLengthValidator("User ID should be between 1-20 characters", 1, 20))
+                .bind(User::getUserID, isUserNew ? User::setUserID : null);
+        binder.forField(passwordField)
+                .withValidator(value -> isPasswordFieldContentValid(value, isUserNew),
+                        "New or modified password should be between 8-30 characters!")
+                .bind(User::getPassword, User::setPassword);
+        binder.forField(firstNameField)
+                .withValidator(new StringLengthValidator("First name should be between 1-20 characters", 1, 20))
+                .bind(User::getFirstName, User::setFirstName);
+        binder.forField(lastNameField)
+                .withValidator(new StringLengthValidator("Last name should be between 1-20 characters", 1, 20))
+                .bind(User::getLastName, User::setLastName);
+        binder.forField(emailField)
+                .withValidator(new EmailValidator("Email should be a valid email address"))
+                .bind(User::getEmail, User::setEmail);
+        binder.forField(activeSelector)
+                .bind(User::getActive, User::setActive);
+        binder.forField(roleSelector)
+                .withValidator(selectedRoles ->
+                                !selectedRoles.isEmpty() && !selectedRoles.contains("BACKEND"),
+                        "Selected roles cannot be empty and cannot contain the BACKEND role!")
+                .bind(User::getRoles, User::setRoles);
 
-        if (!isNewUser) {
-            binder.readBean(user);
-        }
+        binder.readBean(user);
 
         var saveButton = new Button("Save", e -> {
-            List<String> validationProblems = List.of();
             try {
-                binder.writeBeanIfValid(user);
-                adminService.saveUser(user);
-                parent.refreshGridData();
-                close();
+                var isInputValid = binder.validate();
+                if (isInputValid.isOk()) {
+                    binder.writeBeanIfValid(user);
+                    adminService.saveUser(user);
+                    parent.refreshGridData();
+                    close();
+                }
             } catch (UserAdminException err) {
-                var notification = new Notification(err.getMessage());
-                notification.setPosition(Notification.Position.MIDDLE);
-                notification.setDuration(20);
+                showNotification(err.getMessage());
             }
         });
 
@@ -96,15 +106,15 @@ public class AdminUserEditor extends Dialog {
                 getSeparator(2));
     }
 
-    private List<String> getValidationProblems(User user) {
-        var result = Validation.buildDefaultValidatorFactory().getValidator().validate(user);
-        if (result.isEmpty()) {
-            return List.of();
+    private boolean isPasswordFieldContentValid(String password, Boolean isUserNew) {
+        if (isUserNew) {
+            return password != null && password.length() >= 8 && password.length() <= 30;
+        } else if (password != null && !password.isEmpty()) {
+            return password.length() >= 8 && password.length() <= 30;
         }
-        return result.stream()
-                .map(cv -> String.format("%s: %s", cv.getPropertyPath().toString(), cv.getMessage()))
-                .collect(Collectors.toList());
+        return true;
     }
+
 
     private HorizontalLayout getSeparator(int height) {
         var separator = new HorizontalLayout();
@@ -112,4 +122,11 @@ public class AdminUserEditor extends Dialog {
         return separator;
     }
 
+    private void showNotification(String message) {
+        var error = new Dialog();
+        error.add(new Label(message));
+        error.setCloseOnEsc(true);
+        error.setCloseOnOutsideClick(true);
+        error.open();
+    }
 }

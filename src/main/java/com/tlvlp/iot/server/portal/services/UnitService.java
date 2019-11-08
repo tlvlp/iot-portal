@@ -177,7 +177,7 @@ public class UnitService {
                         .setInfo("Test event").setLastUpdated(LocalDateTime.now())
                         .setPayload(Map.of("pay", "load"))
                         .setTargetURL("http://test/modulecontrolfake")))
-                .setLogs(List.of(new Log().setArrived(LocalDateTime.now().minusHours(10)).setLogEntry("Something interesting happened")));
+                .setLogs(List.of(new UnitLog().setArrived(LocalDateTime.now().minusHours(10)).setLogEntry("Something interesting happened")));
         var parsedModules = getParsedModules(unitSelected.getModules());
         var parsedEvents = getParsedEvents(unitSelected.getScheduledEvents());
         unitSelected.setModules(parsedModules).setScheduledEvents(parsedEvents);

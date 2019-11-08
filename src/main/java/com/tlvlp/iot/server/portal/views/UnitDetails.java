@@ -194,11 +194,11 @@ public class UnitDetails extends VerticalLayout {
     }
 
 
-    private Grid<Log> getLogsGrid(List<Log> logs) {
-        var grid = new Grid<Log>();
+    private Grid<UnitLog> getLogsGrid(List<UnitLog> logs) {
+        var grid = new Grid<UnitLog>();
         grid.addColumn(log -> DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm").format(log.getArrived()))
                 .setHeader("Arrived").setAutoWidth(true);
-        grid.addColumn(Log::getLogEntry).setHeader("Entry").setFlexGrow(10);
+        grid.addColumn(UnitLog::getLogEntry).setHeader("Entry").setFlexGrow(10);
         grid.setWidthFull();
         grid.setHeightByRows(true);
         grid.setSelectionMode(Grid.SelectionMode.NONE);

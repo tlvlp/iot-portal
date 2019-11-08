@@ -14,7 +14,7 @@ public class Unit {
     private List<Module> modules;
     private List<String> scheduledEventIDs;
     private List<Event> scheduledEvents;
-    private List<Log> logs;
+    private List<UnitLog> logs;
 
     @Override
     public String toString() {
@@ -113,11 +113,11 @@ public class Unit {
         return this;
     }
 
-    public List<Log> getLogs() {
+    public List<UnitLog> getLogs() {
         return logs;
     }
 
-    public Unit setLogs(List<Log> logs) {
+    public Unit setLogs(List<UnitLog> logs) {
         this.logs = logs;
         return this;
     }

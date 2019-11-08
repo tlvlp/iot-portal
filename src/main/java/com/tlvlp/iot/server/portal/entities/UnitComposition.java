@@ -5,7 +5,7 @@ import java.util.List;
 public class UnitComposition {
 
     private Unit unit;
-    private List<Log> logs;
+    private List<UnitLog> logs;
     private List<Event> events;
 
     public Unit getUnit() {
@@ -17,11 +17,11 @@ public class UnitComposition {
         return this;
     }
 
-    public List<Log> getLogs() {
+    public List<UnitLog> getLogs() {
         return logs;
     }
 
-    public UnitComposition setLogs(List<Log> logs) {
+    public UnitComposition setLogs(List<UnitLog> logs) {
         this.logs = logs;
         return this;
     }

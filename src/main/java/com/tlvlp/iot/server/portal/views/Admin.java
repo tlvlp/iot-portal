@@ -1,8 +1,8 @@
 package com.tlvlp.iot.server.portal.views;
 
 import com.tlvlp.iot.server.portal.entities.User;
-import com.tlvlp.iot.server.portal.services.UserAdminService;
 import com.tlvlp.iot.server.portal.services.UserAdminException;
+import com.tlvlp.iot.server.portal.services.UserAdminService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -17,6 +17,7 @@ import com.vaadin.flow.router.Route;
 import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
+import java.util.Set;
 
 @Route(value = "admin", layout = MainLayout.class)
 @PageTitle("tlvlp IoT Portal - Admin")
@@ -51,25 +52,32 @@ public class Admin extends VerticalLayout implements AfterNavigationObserver {
         grid.setItemDetailsRenderer(new ComponentRenderer<>(this::getUserDetails));
 
         var addUserButton = new Button("Add user", event ->
-                new AdminUserEditor(new User(), roles, adminService, this).open());
+                new AdminUserEditor(getNewDefaultUser(), roles, adminService, this).open());
 
         add(addUserButton, grid);
     }
 
+    private User getNewDefaultUser() {
+        return new User()
+                .setRoles(Set.of("USER"))
+                .setActive(true);
+    }
+
     private HorizontalLayout getUserDetails(User selectedUser) {
+        if (selectedUser.getRoles().contains("BACKEND")) {
+            return new HorizontalLayout(new Label("Backend profiles cannot be modified!"));
+        }
         var deleteButton = new Button("Delete", event -> {
             try {
                 adminService.deleteUser(selectedUser);
+                refreshGridData();
             } catch (UserAdminException e) {
                 showNotification(e.getMessage());
             }
         });
-
-        var updateButton = new Button("Edit", event ->
+        var editButton = new Button("Edit", event ->
                 new AdminUserEditor(selectedUser, roles, adminService, this).open());
-
-
-        return new HorizontalLayout(updateButton, deleteButton);
+        return new HorizontalLayout(editButton, deleteButton);
     }
 
     public void refreshGridData() {
