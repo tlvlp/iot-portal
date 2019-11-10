@@ -2,13 +2,10 @@ package com.tlvlp.iot.server.portal.security;
 
 import com.tlvlp.iot.server.portal.MainView;
 import com.tlvlp.iot.server.portal.views.LoginView;
-import com.tlvlp.iot.server.portal.views.UnitList;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeLeaveEvent;
-import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import org.springframework.stereotype.Component;

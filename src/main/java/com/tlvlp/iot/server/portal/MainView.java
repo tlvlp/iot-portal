@@ -1,7 +1,6 @@
 package com.tlvlp.iot.server.portal;
 
 import com.tlvlp.iot.server.portal.views.UnitList;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
