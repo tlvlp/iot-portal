@@ -6,7 +6,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.env.PropertySource;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -21,6 +20,13 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_ENVIRONMEN
 /**
  * Parses file based secrets and makes them available as new environment variables.
  * The main use-case is to parse Docker Swarm Secrets.
+ * <p>
+ * 0) If the spring profile is set to development mode, then skips secret loading
+ * The profile variable is checked at two places:
+ * - Automatic in the environment variables as spring.profiles.active=dev
+ * - Manual in the application arguments. Since they are not available to be injected
+ * at this stage, a static springProfileArg is exposed that can be manually set from the
+ * the main method, where the arguments are parsed.
  * <p>
  * 1) Looks for two types of environment variables as input:
  * Secrets Folder:
@@ -43,25 +49,28 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_ENVIRONMEN
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class SecretsLoader implements EnvironmentPostProcessor {
 
+    public static String springProfileArg = "";
+
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         System.out.printf("%n%nDiscovering and loading file-based secrets before the service starts.%n");
-        PropertySource<?> system = environment.getPropertySources().get(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
+//        PropertySource<?> system = environment.getPropertySources().get(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
         Map<String, Object> allEnvVariables = environment.getSystemEnvironment();
 
-        var springProfile = allEnvVariables.get("SPRING_ACTIVE_PROFILE");
-        if(springProfile != null && springProfile.toString().equalsIgnoreCase("dev")) {
-            System.out.println("SPRING_ACTIVE_PROFILE is set to Dev. Secrets parsing is skipped!");
+        var springProfileEnv = getSpringProfileEnvirontmentVariable(allEnvVariables);
+        var devProfileName = "dev";
+        if(springProfileEnv.equalsIgnoreCase(devProfileName) || springProfileArg.equalsIgnoreCase(devProfileName)) {
+            System.out.println("The active Spring profile is set to development. Secrets parsing is skipped!");
             return;
         }
 
         System.out.println("Searching for secrets folder environment variable:");
         String secretsFolderName = findFolderVar(allEnvVariables);
-        String secretsFolder = getEnvValue(secretsFolderName, system);
+        String secretsFolder = getEnvValue(secretsFolderName, allEnvVariables);
 
         System.out.println("Searching for secret file environment variables:");
         List<String> secretFileEnvVariables = findFileVars(allEnvVariables);
-        Map<String, String> secretFileNames = getSecretFileNames(secretFileEnvVariables, system);
+        Map<String, String> secretFileNames = getSecretFileNames(secretFileEnvVariables, allEnvVariables);
 
         System.out.println("Reading secret files:");
         Map<String, Object> secrets = getSecrets(secretFileNames, secretsFolder);
@@ -69,6 +78,11 @@ public class SecretsLoader implements EnvironmentPostProcessor {
                 .addAfter(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, new MapPropertySource("secrets", secrets));
         System.out.println("Secret strings are now available at the following environment variables:");
         secrets.keySet().forEach(key -> System.out.printf("    %s%n", key));
+    }
+
+    private String getSpringProfileEnvirontmentVariable(Map<String, Object> allEnvVariables) {
+        var springProfileEnv = allEnvVariables.get("spring.profiles.active");
+        return springProfileEnv == null ? "" : springProfileEnv.toString();
     }
 
     private String findFolderVar(Map<String, Object> allEnvVariables) {
@@ -97,16 +111,16 @@ public class SecretsLoader implements EnvironmentPostProcessor {
         return secretFileEnvVariables;
     }
 
-    private Map<String, String> getSecretFileNames(List<String> secretFileEnvVariables, PropertySource<?> system) {
+    private Map<String, String> getSecretFileNames(List<String> secretFileEnvVariables, Map<String, Object> allEnvVariables) {
         Map<String, String> secretFileNames = new HashMap<>();
         for (String secretEnv : secretFileEnvVariables) {
-            secretFileNames.put(secretEnv, getEnvValue(secretEnv, system));
+            secretFileNames.put(secretEnv, getEnvValue(secretEnv, allEnvVariables));
         }
         return secretFileNames;
     }
 
-    private String getEnvValue(String variableName, PropertySource<?> system) {
-        return String.valueOf(system.getProperty(variableName));
+    private String getEnvValue(String variableName, Map<String, Object> allEnvVariables) {
+        return String.valueOf(allEnvVariables.get(variableName));
     }
 
 
