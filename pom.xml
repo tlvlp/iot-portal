@@ -107,8 +107,6 @@
 								<goals>
 									<goal>prepare-frontend</goal>
 									<goal>build-frontend</goal>
-<!--									<goal>copy-production-files</goal>-->
-<!--									<goal>package-for-production</goal>-->
 								</goals>
 								<phase>compile</phase>
 							</execution>
