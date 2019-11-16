@@ -7,10 +7,21 @@ This Dockerized SpringBoot-based service is responsible providing providing an i
 - Unit monitoring, reporting and interaction
 - User management
 
+## Security
+- Secured with TLS towards the end users
+- Uses HTTP over an encrypted docker network to access the API gateway
+- Does not access the DB directly
+- Uses the API gateway's authentication
+
 ## Building and publishing JAR + Docker image
-This project is using the [Palantir Docker Gradle plugin](https://github.com/palantir/gradle-docker).
-All configuration can be found in the [Gradle build file](build.gradle) file 
-and is recommended to be run with the docker/dockerTagsPush task.
+This project is using the Maven dockerfile plugin.
+All configuration can be found in the [Maven pom.xml](pom.xml) file 
+with separate profiles for production and development.
+
+Example scripts to build the project:
+- [build-dev.sh](build-dev.sh) build with dev parameters and requires a separate lancher
+- [build-prod.sh](build-prod.sh) builds and publishes it to the docker repository
+
 
 ## Dockerhub
 Repository: [tlvlp/iot-portal](https://cloud.docker.com/repository/docker/tlvlp/iot-portal)

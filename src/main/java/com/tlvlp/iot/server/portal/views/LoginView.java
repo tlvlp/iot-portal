@@ -8,7 +8,7 @@ import com.vaadin.flow.router.Route;
 
 @Tag("sa-login-view")
 @Route(value = LoginView.ROUTE)
-@PageTitle("Login")
+@PageTitle("tlvlp IoT portal - Login")
 public class LoginView extends VerticalLayout {
     public static final String ROUTE = "login";
 
@@ -17,7 +17,7 @@ public class LoginView extends VerticalLayout {
     public LoginView() {
         login.setAction("login");
         login.setOpened(true);
-        login.setTitle("tlvlp IoT Portal");
+        login.setTitle("tlvlp IoT portal");
         login.setDescription("");
         getElement().appendChild(login.getElement());
     }

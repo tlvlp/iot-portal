@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Route(value = "unit-list", layout = MainLayout.class)
-@PageTitle("tlvlp IoT Portal - Unit List")
+@PageTitle("tlvlp IoT portal - Unit List")
 @Secured("ROLE_USER")
 public class UnitList extends VerticalLayout implements AfterNavigationObserver {
 

@@ -13,7 +13,7 @@ import org.springframework.security.access.annotation.Secured;
 
 @Route
 @Theme(value = Lumo.class, variant = Lumo.LIGHT)
-@PWA(name = "tlvlp IoT Portal", shortName = "tlvlpIotPortal")
+@PWA(name = "tlvlp IoT portal", shortName = "tlvlpIotPortal")
 @Secured("ROLE_USER")
 public class MainView extends VerticalLayout implements AfterNavigationObserver {
 

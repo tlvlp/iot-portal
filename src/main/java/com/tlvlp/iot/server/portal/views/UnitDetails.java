@@ -31,7 +31,7 @@ import java.util.Set;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 @Route(value = "unit-details", layout = MainLayout.class)
-@PageTitle("tlvlp IoT Portal - Unit Details")
+@PageTitle("tlvlp IoT portal - Unit Details")
 @Secured("ROLE_USER")
 public class UnitDetails extends VerticalLayout {
 

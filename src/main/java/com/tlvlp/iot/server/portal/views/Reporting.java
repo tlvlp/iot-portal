@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Route(value = "reporting", layout = MainLayout.class)
-@PageTitle("tlvlp IoT Portal - Reporting")
+@PageTitle("tlvlp IoT portal - Reporting")
 @Secured("ROLE_USER")
 public class Reporting extends VerticalLayout {
 
