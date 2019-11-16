@@ -68,8 +68,7 @@ public class UnitList extends VerticalLayout implements AfterNavigationObserver 
         detailsButton.setWidth("7em");
 
         var moduleGrid = new Grid<Module>();
-        moduleGrid.addColumn(Module::getModuleType).setAutoWidth(true);
-        moduleGrid.addColumn(Module::getModuleName).setAutoWidth(true);
+        moduleGrid.addColumn(Module::getModuleID).setAutoWidth(true);
         moduleGrid.addColumn(Module::getValue).setFlexGrow(10);
         moduleGrid.setWidthFull();
         moduleGrid.setHeightByRows(true);
