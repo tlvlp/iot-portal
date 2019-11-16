@@ -6,5 +6,5 @@
  \__||_|  \_/  |_|| .__/  \____/   \___/  \/     |___/ \___||_|     \_/   \___||_|
                   |_|
 
-${application.title}${application.formatted-version}
-Using Spring Boot${spring-boot.formatted-version}
+tlvlp-${application.title}${application.formatted-version}
+using spring boot${spring-boot.formatted-version}
