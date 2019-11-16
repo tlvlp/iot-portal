@@ -30,9 +30,8 @@ public class UserAdminService {
                     .basicAuthentication(userID, password)
                     .build()
                     .getForObject(
-                            String.format("https://%s:%s%s",
-                                    properties.getAPI_GATEWAY_NAME(),
-                                    properties.getAPI_GATEWAY_PORT_TLS(),
+                            String.format("%s%s",
+                                    properties.getAPI_GATEWAY_URL_BASE(),
                                     properties.getAPI_GATEWAY_API_AUTHENTICATE_USER()),
                             User.class);
         } catch (Exception e) {
@@ -49,9 +48,8 @@ public class UserAdminService {
                     .basicAuthentication(auth.getName(), auth.getCredentials().toString())
                     .build()
                     .exchange(
-                            String.format("https://%s:%s%s",
-                                    properties.getAPI_GATEWAY_NAME(),
-                                    properties.getAPI_GATEWAY_PORT_TLS(),
+                            String.format("%s%s",
+                                    properties.getAPI_GATEWAY_URL_BASE(),
                                     properties.getAPI_GATEWAY_API_GET_ALL_USERS()),
                             HttpMethod.GET,
                             null,
@@ -72,9 +70,8 @@ public class UserAdminService {
                     .basicAuthentication(auth.getName(), auth.getCredentials().toString())
                     .build()
                     .exchange(
-                            String.format("https://%s:%s%s",
-                                    properties.getAPI_GATEWAY_NAME(),
-                                    properties.getAPI_GATEWAY_PORT_TLS(),
+                            String.format("%s%s",
+                                    properties.getAPI_GATEWAY_URL_BASE(),
                                     properties.getAPI_GATEWAY_API_GET_ROLES()),
                             HttpMethod.GET,
                             null,
@@ -95,9 +92,8 @@ public class UserAdminService {
                     .basicAuthentication(auth.getName(), auth.getCredentials().toString())
                     .build()
                     .postForEntity(
-                            String.format("https://%s:%s%s",
-                                    properties.getAPI_GATEWAY_NAME(),
-                                    properties.getAPI_GATEWAY_PORT_TLS(),
+                            String.format("%s%s",
+                                    properties.getAPI_GATEWAY_URL_BASE(),
                                     properties.getAPI_GATEWAY_API_DELETE_USER()),
                             user,
                             String.class);
@@ -118,9 +114,8 @@ public class UserAdminService {
                     .basicAuthentication(auth.getName(), auth.getCredentials().toString())
                     .build()
                     .postForEntity(
-                            String.format("https://%s:%s%s",
-                                    properties.getAPI_GATEWAY_NAME(),
-                                    properties.getAPI_GATEWAY_PORT_TLS(),
+                            String.format("%s%s",
+                                    properties.getAPI_GATEWAY_URL_BASE(),
                                     properties.getAPI_GATEWAY_API_SAVE_USER()),
                             user,
                             String.class);

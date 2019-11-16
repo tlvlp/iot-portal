@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class ReportingQuery {
 
-    private Unit unit;
+    private UnitBasic unit;
     private Module module;
     private LocalDateTime timeFrom;
     private LocalDateTime timeTo;
@@ -22,11 +22,11 @@ public class ReportingQuery {
                 '}';
     }
 
-    public Unit getUnit() {
+    public UnitBasic getUnit() {
         return unit;
     }
 
-    public ReportingQuery setUnit(Unit unit) {
+    public ReportingQuery setUnit(UnitBasic unit) {
         this.unit = unit;
         return this;
     }

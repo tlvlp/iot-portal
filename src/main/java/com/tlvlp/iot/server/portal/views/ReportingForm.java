@@ -2,7 +2,7 @@ package com.tlvlp.iot.server.portal.views;
 
 import com.tlvlp.iot.server.portal.entities.Module;
 import com.tlvlp.iot.server.portal.entities.ReportingQuery;
-import com.tlvlp.iot.server.portal.entities.Unit;
+import com.tlvlp.iot.server.portal.entities.UnitBasic;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -21,17 +21,17 @@ public class ReportingForm extends VerticalLayout {
 
     private Binder<ReportingQuery> binder;
     private ReportingQuery query;
-    private List<Unit> selectableUnits;
+    private List<UnitBasic> selectableUnits;
     private List<String> selectableProjects;
 
-    public ReportingForm(List<Unit> units) {
+    public ReportingForm(List<UnitBasic> units) {
         this.binder = new Binder<>();
 
         query = new ReportingQuery();
 
         selectableProjects = units
                 .stream()
-                .map(Unit::getProject)
+                .map(UnitBasic::getProject)
                 .distinct()
                 .collect(Collectors.toList());
         selectableUnits = units;
@@ -41,9 +41,9 @@ public class ReportingForm extends VerticalLayout {
         moduleSelector.setItemLabelGenerator(Module::getModuleID);
         moduleSelector.setRequired(true);
 
-        var unitSelector = new ComboBox<Unit>();
+        var unitSelector = new ComboBox<UnitBasic>();
         unitSelector.setWidth("20em");
-        unitSelector.setItemLabelGenerator(Unit::getUnitID);
+        unitSelector.setItemLabelGenerator(UnitBasic::getUnitID);
         unitSelector.setRequired(true);
         unitSelector.setItems(selectableUnits);
         unitSelector.addValueChangeListener(event -> {

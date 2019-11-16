@@ -7,12 +7,15 @@ import org.springframework.context.annotation.Configuration;
 public class Properties {
 
     // The service uses environment variables from the Docker container.
-//
+
+    @Value("${API_GATEWAY_PROTOCOL}")
+    private String API_GATEWAY_PROTOCOL;
+
     @Value("${API_GATEWAY_NAME}")
     private String API_GATEWAY_NAME;
 
-    @Value("${API_GATEWAY_PORT_TLS}")
-    private String API_GATEWAY_PORT_TLS;
+    @Value("${API_GATEWAY_PORT}")
+    private String API_GATEWAY_PORT;
 
     @Value("${API_GATEWAY_API_GET_ALL_UNITS}")
     private String API_GATEWAY_API_GET_ALL_UNITS;
@@ -52,12 +55,11 @@ public class Properties {
     private String API_GATEWAY_API_GET_ROLES;
 
 
-    public String getAPI_GATEWAY_NAME() {
-        return API_GATEWAY_NAME;
-    }
-
-    public String getAPI_GATEWAY_PORT_TLS() {
-        return API_GATEWAY_PORT_TLS;
+    public String getAPI_GATEWAY_URL_BASE() {
+        return String.format("%s://%s:%s",
+                API_GATEWAY_PROTOCOL,
+                API_GATEWAY_NAME,
+                API_GATEWAY_PORT);
     }
 
     public String getAPI_GATEWAY_API_GET_ALL_UNITS() {

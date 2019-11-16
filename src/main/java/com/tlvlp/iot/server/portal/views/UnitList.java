@@ -1,7 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
 import com.tlvlp.iot.server.portal.entities.Module;
-import com.tlvlp.iot.server.portal.entities.Unit;
+import com.tlvlp.iot.server.portal.entities.UnitBasic;
 import com.tlvlp.iot.server.portal.services.UnitRetrievalException;
 import com.tlvlp.iot.server.portal.services.UnitService;
 import com.vaadin.flow.component.ComponentUtil;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 @Secured("ROLE_USER")
 public class UnitList extends VerticalLayout implements AfterNavigationObserver {
 
-    private Grid<Unit> grid;
+    private Grid<UnitBasic> grid;
     private UnitService unitService;
 
 
@@ -36,10 +36,10 @@ public class UnitList extends VerticalLayout implements AfterNavigationObserver 
         this.unitService = unitService;
 
         grid = new Grid<>();
-        grid.addColumn(Unit::getProject).setHeader("Project")
+        grid.addColumn(UnitBasic::getProject).setHeader("Project")
                 .setAutoWidth(true)
                 .setSortable(true);
-        grid.addColumn(Unit::getName).setHeader("Unit")
+        grid.addColumn(UnitBasic::getName).setHeader("Unit")
                 .setAutoWidth(true)
                 .setSortable(true);
         grid.addColumn(u -> u.getActive() ? "Yes" : "No").setHeader("Active")
@@ -62,11 +62,8 @@ public class UnitList extends VerticalLayout implements AfterNavigationObserver 
         add(grid);
     }
 
-    private HorizontalLayout getUnitPreview(Unit selectedUnit) {
-        var detailsButton = new Button("Details", event -> {
-            ComponentUtil.setData(UI.getCurrent(), "unitID", selectedUnit.getUnitID());
-            UI.getCurrent().navigate(UnitDetails.class);
-        });
+    private HorizontalLayout getUnitPreview(UnitBasic selectedUnit) {
+        var detailsButton = new Button("Details", event -> openUnitDetails(selectedUnit.getUnitID()));
         detailsButton.setAutofocus(true);
         detailsButton.setWidth("7em");
 
@@ -79,6 +76,11 @@ public class UnitList extends VerticalLayout implements AfterNavigationObserver 
         moduleGrid.setItems(new ArrayList<>(selectedUnit.getModules()));
 
         return new HorizontalLayout(detailsButton, moduleGrid);
+    }
+
+    private void openUnitDetails(String unitID) {
+        ComponentUtil.setData(UI.getCurrent(), "unitID", unitID);
+        UI.getCurrent().navigate(UnitDetails.class);
     }
 
     private void showNotification(String message) {

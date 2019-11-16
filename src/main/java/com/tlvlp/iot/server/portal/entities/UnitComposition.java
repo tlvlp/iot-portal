@@ -4,15 +4,26 @@ import java.util.List;
 
 public class UnitComposition {
 
-    private Unit unit;
+    private UnitBasic unit;
     private List<UnitLog> logs;
     private List<Event> events;
+    private List<Module> modules;
 
-    public Unit getUnit() {
+    @Override
+    public String toString() {
+        return "UnitComposition{" +
+                "unit=" + unit +
+                ", logs=" + logs +
+                ", events=" + events +
+                ", modules=" + modules +
+                '}';
+    }
+
+    public UnitBasic getUnit() {
         return unit;
     }
 
-    public UnitComposition setUnit(Unit unit) {
+    public UnitComposition setUnit(UnitBasic unit) {
         this.unit = unit;
         return this;
     }
@@ -32,6 +43,15 @@ public class UnitComposition {
 
     public UnitComposition setEvents(List<Event> events) {
         this.events = events;
+        return this;
+    }
+
+    public List<Module> getModules() {
+        return modules;
+    }
+
+    public UnitComposition setModules(List<Module> modules) {
+        this.modules = modules;
         return this;
     }
 }

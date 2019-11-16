@@ -37,6 +37,7 @@ public class UnitDetails extends VerticalLayout {
 
     private static final Logger log = LoggerFactory.getLogger(UnitDetails.class);
     private UnitService unitService;
+    private String unitID;
 
     public UnitDetails(UnitService unitService) {
         this.unitService = unitService;
@@ -47,28 +48,29 @@ public class UnitDetails extends VerticalLayout {
         try {
             var unitID = (String) ComponentUtil.getData(UI.getCurrent(), "unitID");
             if (unitID == null) {
-                throw new UnitRetrievalException("Unit ID was not passed!");
+                throw new UnitRetrievalException("Unit ID was not passed between views!");
             }
-            var unitWithDetails = unitService.getUnitWithSchedulesAndLogs(unitID);
-            if (unitWithDetails == null) {
+            var unitComposition = unitService.getUnitWithSchedulesAndLogs(unitID);
+            if (unitComposition == null) {
                 throw new UnitRetrievalException("Unit not found at the server");
             }
+            this.unitID = unitComposition.getUnit().getUnitID();
             removeAll();
             add(
                     getLabel("Unit Details:"),
-                    getUnitDetailsForm(unitWithDetails),
+                    getUnitDetailsForm(unitComposition),
                     getSeparator(),
                     getLabel("Modules:"),
-                    getModulesGrid(unitWithDetails.getModules()),
+                    getModulesGrid(unitComposition.getModules()),
                     getSeparator(),
                     getLabel("Scheduled Events:"),
-                    getEventsGrid(unitWithDetails.getScheduledEvents()),
-                    getSeparator(),
-                    getLabel("Unit Logs (last 7 days)"),
-                    getLogsGrid(unitWithDetails.getLogs()),
+                    getEventsGrid(unitComposition.getEvents()),
                     getSeparator(),
                     getLabel("Generate Report:"),
-                    getReportingForm(unitWithDetails));
+                    getReportingForm(unitComposition.getUnit()),
+                    getSeparator(),
+                    getLabel("Unit Logs (last 7 days)"),
+                    getLogsGrid(unitComposition.getLogs()));
         } catch (Exception e) {
             e.printStackTrace();
             String err = "Unit details cannot be retrieved: ";
@@ -88,7 +90,7 @@ public class UnitDetails extends VerticalLayout {
         return separator;
     }
 
-    private FormLayout getUnitDetailsForm(Unit unit) {
+    private FormLayout getUnitDetailsForm(UnitComposition unit) {
         var unitIDField = new TextField();
         var projectField = new TextField();
         var nameField = new TextField();
@@ -103,20 +105,20 @@ public class UnitDetails extends VerticalLayout {
         form.addFormItem(lastSeenField, "Last seen");
         form.addFormItem(new Button("Refresh Data", event -> initializePageData()), "");
 
-        var binder = new Binder<Unit>();
-        binder.forField(unitIDField).bind(Unit::getUnitID, null);
-        binder.forField(projectField).bind(Unit::getProject, null);
-        binder.forField(nameField).bind(Unit::getName, null);
-        binder.forField(activeField).bind(u -> u.getActive() ? "Yes" : "No", null);
+        var binder = new Binder<UnitComposition>();
+        binder.forField(unitIDField).bind(u -> u.getUnit().getUnitID(), null);
+        binder.forField(projectField).bind(u -> u.getUnit().getProject(), null);
+        binder.forField(nameField).bind(u -> u.getUnit().getName(), null);
+        binder.forField(activeField).bind(u -> u.getUnit().getActive() ? "Yes" : "No", null);
         binder.forField(lastSeenField).bind(u ->
-                DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm").format(u.getLastSeen()), null);
+                DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm").format(u.getUnit().getLastSeen()), null);
         binder.setReadOnly(true);
         binder.readBean(unit);
 
         return form;
     }
 
-    private VerticalLayout getReportingForm(Unit unit) {
+    private VerticalLayout getReportingForm(UnitBasic unit) {
         if (unit.getModules().isEmpty()) {
             return new VerticalLayout(new Label("Cannot generate reports for Unit: No modules found"));
         }
@@ -159,7 +161,7 @@ public class UnitDetails extends VerticalLayout {
 
     private void changeRelayState(Module module) {
         try {
-            unitService.changeRelayStateFor(module);
+            unitService.changeRelayState(module);
         } catch (UnitUpdateException e) {
             showNotification("Relay state cannot be changed: " + e.getMessage());
         }
@@ -182,12 +184,13 @@ public class UnitDetails extends VerticalLayout {
     }
 
     private void popUpEventEditor(Event selectedEvent) {
-        new UnitDetailsEventEditor(selectedEvent, unitService, this).open();
+        new UnitDetailsEventEditor(selectedEvent, unitID, unitService, this).open();
     }
 
     private void deleteEvent(Event selectedEvent) {
         try {
-            unitService.deleteScheduledEventFromUnit(selectedEvent);
+            unitService.deleteScheduledEventFromUnit(selectedEvent, unitID);
+            initializePageData();
         } catch (UnitUpdateException e) {
             showNotification("Cannot delete event: " + e.getMessage());
         }

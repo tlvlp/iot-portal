@@ -1,7 +1,7 @@
 package com.tlvlp.iot.server.portal.views;
 
 import com.tlvlp.iot.server.portal.entities.ReportingQuery;
-import com.tlvlp.iot.server.portal.entities.Unit;
+import com.tlvlp.iot.server.portal.entities.UnitBasic;
 import com.tlvlp.iot.server.portal.services.ReportingService;
 import com.tlvlp.iot.server.portal.services.UnitRetrievalException;
 import com.tlvlp.iot.server.portal.services.UnitService;
@@ -70,7 +70,7 @@ public class Reporting extends VerticalLayout {
         ComponentUtil.setData(UI.getCurrent(), ReportingQuery.class, form.getQuery());
     }
 
-    private List<Unit> getUnitListFromBackend() throws UnitRetrievalException {
+    private List<UnitBasic> getUnitListFromBackend() throws UnitRetrievalException {
         return unitService.getUnitListWithModules();
     }
 
