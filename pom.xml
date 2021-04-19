@@ -16,7 +16,7 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<vaadin.version>14.0.12</vaadin.version>
+		<vaadin.version>14.4.10</vaadin.version>
 		<dockerfile.maven.version>1.4.13</dockerfile.maven.version>
 		<flow.server.prod.version>2.0.17</flow.server.prod.version>
 		<!--	DOCKER IMAGE ARGS	-->
